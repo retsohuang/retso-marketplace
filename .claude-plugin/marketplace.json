@@ -1,0 +1,25 @@
+{
+  "name": "retso-marketplace",
+  "owner": {
+    "name": "Retso Huang",
+    "email": "retsohuang@gmail.com"
+  },
+  "description": "Custom marketplace for Claude Code plugins",
+  "version": "1.0.0",
+  "pluginRoot": "./plugins",
+  "plugins": [
+    {
+      "name": "example-plugin",
+      "description": "Example plugin - replace with your actual plugins",
+      "version": "1.0.0",
+      "source": "./plugins/example-plugin",
+      "author": {
+        "name": "Retso Huang",
+        "email": "retsohuang@gmail.com"
+      },
+      "license": "MIT",
+      "keywords": ["example"],
+      "strict": false
+    }
+  ]
+}
