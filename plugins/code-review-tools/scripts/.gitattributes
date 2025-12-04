@@ -1,0 +1,5 @@
+# Ensure consistent line endings across platforms
+*.js text eol=lf
+*.ts text eol=lf
+*.json text eol=lf
+*.md text eol=lf
