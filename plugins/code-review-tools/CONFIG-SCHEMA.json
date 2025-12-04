@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Code Review Configuration",
+  "description": "Configuration for code-review-tools plugin custom rules and settings",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Config schema version for future compatibility",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "default": "1.0.0"
+    },
+    "builtInRules": {
+      "type": "object",
+      "description": "Enable or disable built-in rule sets",
+      "properties": {
+        "componentExtraction": {
+          "type": "boolean",
+          "description": "Verify component extraction for proper parity and conditional rendering",
+          "default": true
+        },
+        "componentReuse": {
+          "type": "boolean",
+          "description": "Check for missed opportunities to reuse existing components",
+          "default": true
+        },
+        "aiSlop": {
+          "type": "boolean",
+          "description": "Detect AI-generated patterns inconsistent with codebase style",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "customRules": {
+      "type": "array",
+      "description": "Custom rule files to include in review (relative to .claude/code-review-rules/)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Descriptive name for the rule set",
+            "minLength": 1
+          },
+          "file": {
+            "type": "string",
+            "description": "Filename relative to .claude/code-review-rules/ (must be .md file)",
+            "pattern": "^[^/]+\\.md$"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether this custom rule is active",
+            "default": true
+          }
+        },
+        "required": ["name", "file"],
+        "additionalProperties": false
+      }
+    },
+    "reportFormat": {
+      "type": "object",
+      "description": "Optional customization for report output",
+      "properties": {
+        "customFormatFile": {
+          "type": "string",
+          "description": "Override default report format with custom file (relative to .claude/code-review-rules/)",
+          "pattern": "^[^/]+\\.md$"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "version": "1.0.0",
+      "builtInRules": {
+        "componentExtraction": true,
+        "componentReuse": true,
+        "aiSlop": false
+      }
+    },
+    {
+      "version": "1.0.0",
+      "builtInRules": {
+        "componentExtraction": true,
+        "componentReuse": true,
+        "aiSlop": true
+      },
+      "customRules": [
+        {
+          "name": "Automation Opportunities",
+          "file": "automation-opportunities.md",
+          "enabled": true
+        },
+        {
+          "name": "Team Conventions",
+          "file": "team-conventions.md",
+          "enabled": true
+        },
+        {
+          "name": "Security Checks",
+          "file": "security-checks.md",
+          "enabled": true
+        },
+        {
+          "name": "Performance Patterns",
+          "file": "performance-patterns.md",
+          "enabled": false
+        }
+      ],
+      "reportFormat": {
+        "customFormatFile": "custom-report-format.md"
+      }
+    }
+  ]
+}

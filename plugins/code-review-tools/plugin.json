@@ -1,0 +1,13 @@
+{
+  "name": "code-review-tools",
+  "description": "Review code changes commit-by-commit with custom rules support. Includes interactive setup and rule creation.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Retso Huang",
+    "email": "retsohuang@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["code-review", "git", "quality"],
+  "category": "development",
+  "commands": ["commands"]
+}

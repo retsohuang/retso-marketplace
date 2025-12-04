@@ -1,4 +1,5 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "retso-marketplace",
   "owner": {
     "name": "Retso Huang",
@@ -6,20 +7,19 @@
   },
   "description": "Custom marketplace for Claude Code plugins",
   "version": "1.0.0",
-  "pluginRoot": "./plugins",
   "plugins": [
     {
-      "name": "example-plugin",
-      "description": "Example plugin - replace with your actual plugins",
+      "name": "code-review-tools",
+      "description": "Review code changes commit-by-commit with custom rules support. Includes interactive setup and rule creation.",
       "version": "1.0.0",
-      "source": "./plugins/example-plugin",
+      "source": "./plugins/code-review-tools",
       "author": {
         "name": "Retso Huang",
         "email": "retsohuang@gmail.com"
       },
       "license": "MIT",
-      "keywords": ["example"],
-      "strict": false
+      "keywords": ["code-review", "git", "quality"],
+      "category": "development"
     }
   ]
 }
