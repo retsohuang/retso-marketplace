@@ -193,7 +193,7 @@ Configuration is stored in `.claude/code-review-config.json` at your project roo
 
 ```json
 {
-  "$schema": "${CLAUDE_PLUGIN_ROOT}/CONFIG-SCHEMA.json",
+  "$schema": "${CLAUDE_PLUGIN_ROOT}/config-schema.json",
   "builtInRules": {
     "componentExtraction": true,
     "componentReuse": true,
