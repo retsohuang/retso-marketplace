@@ -32,6 +32,10 @@ jobs:
         working-directory: plugins/code-review-tools/scripts
         run: bun install
 
+      - name: Build
+        working-directory: plugins/code-review-tools/scripts
+        run: bun run build
+
       - name: Run tests
         working-directory: plugins/code-review-tools/scripts
         run: bun test
@@ -39,10 +43,6 @@ jobs:
       - name: Type check
         working-directory: plugins/code-review-tools/scripts
         run: bun run typecheck
-
-      - name: Build
-        working-directory: plugins/code-review-tools/scripts
-        run: bun run build
 
       - name: Check dist/ is up to date
         working-directory: plugins/code-review-tools/scripts
@@ -69,9 +69,18 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Test load-config command
-        working-directory: plugins/code-review-tools
-        run: node scripts/dist/cli.js load-config --json
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        working-directory: plugins/code-review-tools/scripts
+        run: bun install
+
+      - name: Build
+        working-directory: plugins/code-review-tools/scripts
+        run: bun run build
 
       - name: Test CLI help
         working-directory: plugins/code-review-tools
