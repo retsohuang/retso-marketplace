@@ -21,7 +21,7 @@ const schema = {
   ...jsonSchema,
 }
 
-const schemaPath = join(__dirname, "..", "..", "CONFIG-SCHEMA.json")
+const schemaPath = join(__dirname, "..", "..", "config-schema.json")
 writeFileSync(schemaPath, JSON.stringify(schema, null, 2) + "\n", "utf-8")
 
-console.log("✅ Generated CONFIG-SCHEMA.json")
+console.log("✅ Generated config-schema.json")
