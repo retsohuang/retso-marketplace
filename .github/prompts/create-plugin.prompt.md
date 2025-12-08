@@ -1,5 +1,5 @@
 ---
-agent: "agent"
+agent: "Plan"
 tools: ["codebase", "editFiles", "search", "runCommands"]
 description: "Guide users through creating Claude Code plugins with commands, agents, hooks, and MCP configurations following best practices."
 ---
