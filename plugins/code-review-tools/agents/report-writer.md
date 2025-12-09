@@ -111,11 +111,6 @@ For each commit SHA in `commitList`:
    {reportTemplate}
    ---
 
-   Summary Template (for reference):
-   ---
-   {summaryTemplate}
-   ---
-
    Return JSON only.
    ```
 
@@ -348,30 +343,90 @@ Before writing the report file, verify:
 
 Generate the terminal summary following the provided Summary Template.
 
+**The Summary Template is a pure template** — use it directly as the output format by replacing all variable placeholders with calculated values.
+
 **Process**:
 
-1. **Parse the Summary Template** provided in the input
-   - Extract the template structure between `## TEMPLATE START` and `## TEMPLATE END`
-   - Identify all variable placeholders (e.g., `{commitRange}`, `{commits}`, etc.)
+1. **Calculate values for each variable**:
 
-2. **Calculate values for each variable**:
-   - `{commitRange}`: From Output Config
-   - `{commits}`: Total commits reviewed
-   - `{files}`: Total files changed across all commits
-   - `{issues}`: Total issues found (after deduplication)
-   - `{agentCount}`: Number of commit-reviewer agents spawned
-   - `{batchCount}`: If maxConcurrentAgents=0, use "1 batch (unlimited)"; otherwise calculate ceil(commits/maxConcurrent)
-   - `{maxConcurrent}`: From Output Config
-   - `{dedupLine}`: If duplicates removed, format as "- X duplicate issue(s) removed"; otherwise use empty string (remove the line entirely)
-   - `{topIssues}`: Format top 2-4 issue categories with emoji icons and counts (e.g., "- 🧹 AI Slop: 5")
-   - `{recommendations}`: List 1-3 most important actionable recommendations (1 line each)
-   - `{outputFile}`: Full path to the saved report file
+| Variable            | Description                              | Format/Calculation                                |
+| ------------------- | ---------------------------------------- | ------------------------------------------------- |
+| `{commitRange}`     | Git commit range being reviewed          | From input data (e.g., `abc123..HEAD`)           |
+| `{commits}`         | Total number of commits reviewed         | Count of commits in commitList                    |
+| `{files}`           | Total number of files changed            | Sum of filesChanged across all commits            |
+| `{issues}`          | Total number of issues found             | Total issues after deduplication                  |
+| `{agentCount}`      | Number of commit-reviewer agents spawned | Number of agents invoked (= commits count)        |
+| `{batchCount}`      | Number of batches processed              | See format below                                  |
+| `{maxConcurrent}`   | Max concurrent agents setting            | From input data                                   |
+| `{dedupLine}`       | Deduplication info (if applicable)       | See format below                                  |
+| `{topIssues}`       | List of top issue categories with counts | See format below                                  |
+| `{recommendations}` | List of key actionable recommendations   | See format below                                  |
+| `{outputFile}`      | Full path to the saved report file       | Full path where report was written                |
+
+2. **Format Special Variables**:
+
+**{batchCount} Format**:
+- If `maxConcurrentAgents = 0`: Use `"1 batch (unlimited)"`
+- If `maxConcurrentAgents > 0`: Calculate `ceil(commits / maxConcurrent)` (e.g., `"3"`)
+
+**{dedupLine} Format**:
+- If duplicates were removed: `"- {N} duplicate issue(s) removed"`
+- If NO duplicates: Use empty string `""` (the line will be removed from output)
+
+**{topIssues} Format**:
+List top 2-4 issue categories with emoji icons and counts (most common first):
+```markdown
+- 🧹 AI Slop: 5
+- 💡 Missed Component Reuse: 2
+- ⚠️ Component Extraction Issues: 1
+```
+- Use category icons from issue results
+- If no issues found: `"- ✅ No issues found"`
+
+**{recommendations} Format**:
+List 1-3 most important actionable recommendations:
+```markdown
+1. Remove unnecessary disabled={false} props - React treats missing boolean props as false by default
+2. Investigate proper types to eliminate double type assertion workarounds
+```
+- Keep each recommendation to 1 line (no line breaks)
+- Be specific and actionable
+- Focus on high-impact or recurring issues
+- Omit commit references (they're in the full report)
 
 3. **Replace all placeholders** in the template with calculated values
 
 4. **Clean up formatting**:
    - If `{dedupLine}` is empty, remove that entire line (including the newline)
    - Ensure proper spacing and line breaks
+   - Summary should be 15-20 lines max (fits in terminal view)
+
+**Example Output**:
+
+```markdown
+## Code Review Summary: refactor-auth..HEAD
+
+| Commits | Files | Issues |
+| ------- | ----- | ------ |
+| 8       | 45    | 12     |
+
+**Review Process:**
+- Reviewed 8 commits using 8 commit-reviewer agents
+- Processed in 1 batch (unlimited) (maxConcurrentAgents: 0)
+- 3 duplicate issue(s) removed
+
+**Top Issues:**
+- 💡 Missed Component Reuse: 7
+- 🧹 AI Slop: 3
+- ⚠️ Component Extraction Issues: 2
+
+**Key Recommendations:**
+1. Consolidate repeated auth form patterns into a shared AuthForm component
+2. Replace manual user avatar rendering with existing UserAvatar component
+3. Fix type definitions for API responses instead of using type assertions
+
+📄 Full report saved to: .claude/code-review-reports/refactor-auth+2025-12-05T18-45-12.md
+```
 
 **CRITICAL OUTPUT RULES**:
 - Return ONLY the formatted summary (following the template)
