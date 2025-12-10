@@ -7,7 +7,7 @@ model: claude-haiku-4-5
 # Code Review Setup
 
 Initialize code review configuration for your project. This command will guide you through setting up:
-- Configuration file (`.claude/code-review-config.json`)
+- Configuration file (`.claude/code-review-tools/config.json`)
 - Built-in rule preferences
 
 ## Usage
@@ -22,11 +22,11 @@ No arguments required - the command will guide you through the setup interactive
 
 ### Step 1: Check Existing Configuration
 
-Check if `.claude/code-review-config.json` already exists:
+Check if `.claude/code-review-tools/config.json` already exists:
 
 ```bash
-if [ -f .claude/code-review-config.json ]; then
-  echo "⚠️ Configuration file already exists at .claude/code-review-config.json"
+if [ -f .claude/code-review-tools/config.json ]; then
+  echo "⚠️ Configuration file already exists at .claude/code-review-tools/config.json"
   # Ask user if they want to overwrite or cancel
 fi
 ```
@@ -51,13 +51,13 @@ Use the AskUserQuestion tool to ask which built-in rules to enable:
 
 ### Step 3: Generate Configuration File
 
-Create `.claude/` directory if it doesn't exist:
+Create `.claude/code-review-tools/` directory if it doesn't exist:
 
 ```bash
-mkdir -p .claude
+mkdir -p .claude/code-review-tools
 ```
 
-Generate `.claude/code-review-config.json` based on user selections:
+Generate `.claude/code-review-tools/config.json` based on user selections:
 
 ```json
 {
@@ -79,7 +79,7 @@ Display a summary of what was created:
 ✅ Setup Complete!
 
 Created:
-- .claude/code-review-config.json
+- .claude/code-review-tools/config.json
 
 Built-in rules enabled:
 - ✅ Component Extraction
@@ -89,7 +89,7 @@ Built-in rules enabled:
 Next steps:
 1. Run a review: /code-review-tools:review <commit-hash>
 2. Create custom rules: /code-review-tools:create-rule
-3. Edit .claude/code-review-config.json to enable/disable rules
+3. Edit .claude/code-review-tools/config.json to enable/disable rules
 
 Tip: Use /code-review-tools:create-rule to add project-specific review rules.
 ```
@@ -102,7 +102,7 @@ Tip: Use /code-review-tools:create-rule to add project-specific review rules.
 
 ## Notes
 
-- Config file location: `.claude/code-review-config.json`
-- Custom rules directory: `.claude/code-review-rules/` (created when you add custom rules)
+- Config file location: `.claude/code-review-tools/config.json`
+- Custom rules directory: `.claude/code-review-tools/rules/` (created when you add custom rules)
 - Use `/code-review-tools:create-rule` to generate custom rules interactively
 - Users can always run this command again to regenerate config
