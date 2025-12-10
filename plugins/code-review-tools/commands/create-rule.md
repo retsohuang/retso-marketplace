@@ -25,9 +25,9 @@ No arguments required - the command will guide you through the rule creation pro
 
 ### Step 1: Check Prerequisites
 
-1. **Check if `.claude/code-review-rules/` directory exists:**
+1. **Check if `.claude/code-review-tools/rules/` directory exists:**
    ```bash
-   if [ ! -d .claude/code-review-rules ]; then
+   if [ ! -d .claude/code-review-tools/rules ]; then
      echo "⚠️  Custom rules directory doesn't exist yet."
      echo "Would you like to:"
      echo "  1. Create the directory now"
@@ -35,9 +35,9 @@ No arguments required - the command will guide you through the rule creation pro
    fi
    ```
 
-2. **Check if `.claude/code-review-config.json` exists:**
+2. **Check if `.claude/code-review-tools/config.json` exists:**
    ```bash
-   if [ ! -f .claude/code-review-config.json ]; then
+   if [ ! -f .claude/code-review-tools/config.json ]; then
      echo "⚠️  No configuration file found."
      echo "Creating basic configuration..."
      # Create minimal config
@@ -209,16 +209,16 @@ Don't flag if:
    # Check if file already exists
    ```
 
-2. **Write to `.claude/code-review-rules/{rule-name}.md`:**
+2. **Write to `.claude/code-review-tools/rules/{rule-name}.md`:**
    ```bash
-   cat > .claude/code-review-rules/${RULE_NAME}.md <<'EOF'
+   cat > .claude/code-review-tools/rules/${RULE_NAME}.md <<'EOF'
    [Generated rule content]
    EOF
    ```
 
 3. **Verify file was created:**
    ```bash
-   if [ -f .claude/code-review-rules/${RULE_NAME}.md ]; then
+   if [ -f .claude/code-review-tools/rules/${RULE_NAME}.md ]; then
      echo "✅ Rule file created successfully"
    else
      echo "❌ Failed to create rule file"
@@ -228,11 +228,11 @@ Don't flag if:
 
 ### Step 6: Update Configuration
 
-Automatically add the new rule to `.claude/code-review-config.json`:
+Automatically add the new rule to `.claude/code-review-tools/config.json`:
 
 1. **Read current config:**
    ```bash
-   current_config=$(cat .claude/code-review-config.json)
+   current_config=$(cat .claude/code-review-tools/config.json)
    ```
 
 2. **Add new rule to customRules array:**
@@ -246,7 +246,7 @@ Automatically add the new rule to `.claude/code-review-config.json`:
 
 3. **Write updated config:**
    ```bash
-   echo "$updated_config" | jq '.' > .claude/code-review-config.json
+   echo "$updated_config" | jq '.' > .claude/code-review-tools/config.json
    ```
 
 ### Step 7: Show Summary and Next Steps
@@ -256,7 +256,7 @@ Display a summary of what was created:
 ```
 ✅ Custom Rule Created!
 
-Rule file: .claude/code-review-rules/[rule-name].md
+Rule file: .claude/code-review-tools/rules/[rule-name].md
 Category: [Category]
 Status: Enabled
 
@@ -271,7 +271,7 @@ Next steps:
 2. Test the rule by running a review:
    /code-review-tools:review <commit-hash>
 
-3. Disable the rule temporarily (edit .claude/code-review-config.json):
+3. Disable the rule temporarily (edit .claude/code-review-tools/config.json):
    "enabled": false
 
 4. Create more rules:

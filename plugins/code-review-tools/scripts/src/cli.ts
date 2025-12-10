@@ -9,7 +9,6 @@ import {
   parseConfig,
 } from "./config-schema.js"
 
-
 interface SuccessOutput<T = unknown> {
   success: true
   data: T
@@ -30,12 +29,8 @@ function error(message: string): ErrorOutput {
   return { success: false, error: message }
 }
 
-
-
-function loadConfig(
-  configPath?: string,
-): Output<ReviewConfig> {
-  const path = configPath || ".claude/code-review-config.json"
+function loadConfig(configPath?: string): Output<ReviewConfig> {
+  const path = configPath || ".claude/code-review-tools/config.json"
 
   try {
     if (!existsSync(path)) {
@@ -50,8 +45,6 @@ function loadConfig(
     return error(`Failed to load config: ${(err as Error).message}`)
   }
 }
-
-
 
 interface CommitInfo {
   hash: string
@@ -126,11 +119,11 @@ async function collectCommits(
       totalCommits: commits.length,
     })
   } catch (err) {
-    return error(`Failed to collect commits: ${(err as GitResponseError).message}`)
+    return error(
+      `Failed to collect commits: ${(err as GitResponseError).message}`,
+    )
   }
 }
-
-
 
 interface BuildRulesResult {
   rulesContent: string
@@ -176,7 +169,7 @@ function buildRules(
 
     for (const rule of config.customRules ?? []) {
       if (rule.enabled) {
-        const rulePath = `.claude/code-review-rules/${rule.file}`
+        const rulePath = `.claude/code-review-tools/rules/${rule.file}`
         if (existsSync(rulePath)) {
           const content = readFileSync(rulePath, "utf-8")
           rulesSections.push(`# ${rule.name} Rules\n\n${content}\n\n---\n`)
@@ -200,8 +193,6 @@ function buildRules(
   }
 }
 
-
-
 interface PrepareReviewResult {
   commits: CommitInfo[]
   commitList: string[]
@@ -223,7 +214,7 @@ function loadTemplate(
   let templatePath: string
 
   if (customTemplate) {
-    templatePath = `.claude/code-review-templates/${customTemplate}`
+    templatePath = `.claude/code-review-tools/templates/${customTemplate}`
   } else {
     templatePath = `${pluginRoot}/templates/${defaultTemplateName}`
   }
@@ -282,15 +273,14 @@ async function prepareReview(
       rulesContent: rulesResult.data.rulesContent,
       reportTemplate,
       summaryTemplate,
-      outputDirectory: config.reports?.outputDirectory ?? ".claude/code-review-reports",
+      outputDirectory:
+        config.reports?.outputDirectory ?? ".claude/code-review-tools/reports",
       maxConcurrentAgents: config.parallelization?.maxConcurrentAgents ?? 0,
     })
   } catch (err) {
     return error(`Failed to prepare review: ${(err as Error).message}`)
   }
 }
-
-
 
 function printUsage(): void {
   console.log(`

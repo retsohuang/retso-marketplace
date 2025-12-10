@@ -134,7 +134,7 @@ describe("CLI - prepare command", () => {
       `node ${CLI_PATH} prepare ${startCommit} --plugin-root ${PLUGIN_ROOT}`,
       {
         encoding: "utf-8",
-        cwd: tempDir, // Temp dir has no .claude/code-review-config.json
+        cwd: tempDir, // Temp dir has no .claude/code-review-tools/config.json
       },
     )
 
@@ -142,15 +142,17 @@ describe("CLI - prepare command", () => {
 
     expect(result.success).toBe(true)
     expect(result.data.maxConcurrentAgents).toBe(0)
-    expect(result.data.outputDirectory).toBe(".claude/code-review-reports")
+    expect(result.data.outputDirectory).toBe(
+      ".claude/code-review-tools/reports",
+    )
     expect(result.data.rulesContent).toContain("Component Extraction")
     expect(result.data.rulesContent).toContain("Component Reuse")
     expect(result.data.rulesContent).toContain("AI Slop")
   })
 
   test("uses overridden config values when config file exists", async () => {
-    const configDir = join(tempDir, ".claude")
-    const configPath = join(configDir, "code-review-config.json")
+    const configDir = join(tempDir, ".claude/code-review-tools")
+    const configPath = join(configDir, "config.json")
 
     execSync(`mkdir -p ${configDir}`, { cwd: tempDir })
     writeFileSync(

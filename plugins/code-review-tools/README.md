@@ -37,7 +37,7 @@ First-time setup to configure which rules to use:
 ```
 
 This will:
-- Create `.claude/code-review-config.json` in your project
+- Create `.claude/code-review-tools/config.json` in your project
 - Let you choose which built-in rules to enable
 - Optionally generate example custom rules
 
@@ -187,7 +187,7 @@ Identifies AI-generated patterns inconsistent with codebase style:
 
 ## Configuration
 
-Configuration is stored in `.claude/code-review-config.json` at your project root.
+Configuration is stored in `.claude/code-review-tools/config.json` at your project root.
 
 ### Config Structure
 
@@ -209,7 +209,7 @@ Configuration is stored in `.claude/code-review-config.json` at your project roo
   "reports": {
     "template": "custom-report-template.md",
     "summaryTemplate": "custom-summary-template.md",
-    "outputDirectory": ".claude/code-review-reports"
+    "outputDirectory": ".claude/code-review-tools/reports"
   },
   "parallelization": {
     "maxConcurrentAgents": 0
@@ -221,10 +221,10 @@ Configuration is stored in `.claude/code-review-config.json` at your project roo
 
 - **$schema**: Path to JSON Schema for IDE autocomplete/validation (optional)
 - **builtInRules**: Enable/disable each built-in rule
-- **customRules**: Array of custom rule files from `.claude/code-review-rules/`
+- **customRules**: Array of custom rule files from `.claude/code-review-tools/rules/`
 - **reports.template**: Custom report template for saved markdown files (optional)
 - **reports.summaryTemplate**: Custom summary template for terminal output (optional)
-- **reports.outputDirectory**: Where to save detailed markdown reports (default: `.claude/code-review-reports`)
+- **reports.outputDirectory**: Where to save detailed markdown reports (default: `.claude/code-review-tools/reports`)
 - **parallelization.maxConcurrentAgents**: Max parallel commit-reviewer agents (0=unlimited default, 1-20=batch size)
 
 See [config-schema.json](./config-schema.json) for the complete schema.
@@ -306,14 +306,14 @@ See [config-schema.json](./config-schema.json) for the complete schema.
     "aiSlop": true
   },
   "reports": {
-    "outputDirectory": ".claude/code-review-reports"
+    "outputDirectory": ".claude/code-review-tools/reports"
   }
 }
 ```
 
 ### Manual Configuration
 
-You can edit `.claude/code-review-config.json` directly:
+You can edit `.claude/code-review-tools/config.json` directly:
 
 **Disable a built-in rule:**
 ```json
@@ -350,7 +350,7 @@ You can edit `.claude/code-review-config.json` directly:
 }
 ```
 
-Both template files should be placed in `.claude/code-review-templates/` and follow the structure of the default templates:
+Both template files should be placed in `.claude/code-review-tools/templates/` and follow the structure of the default templates:
 - **Report template**: Defines the structure of the full markdown report saved to disk
 - **Summary template**: Defines the format of the brief terminal output
 
@@ -358,7 +358,7 @@ See `plugins/code-review-tools/templates/report-template.md` and `plugins/code-r
 
 ## Custom Rules
 
-Custom rules are markdown files stored in `.claude/code-review-rules/` that define:
+Custom rules are markdown files stored in `.claude/code-review-tools/rules/` that define:
 - What patterns to check for
 - How to detect issues
 - Good and bad code examples
@@ -373,9 +373,9 @@ Custom rules are markdown files stored in `.claude/code-review-rules/` that defi
 ```
 
 **Manual:**
-1. Create a markdown file in `.claude/code-review-rules/`
+1. Create a markdown file in `.claude/code-review-tools/rules/`
 2. Follow the structure of built-in rules (see `rules/` directory)
-3. Add it to `.claude/code-review-config.json`
+3. Add it to `.claude/code-review-tools/config.json`
 
 ### Example Custom Rules
 
@@ -428,7 +428,7 @@ The terminal output format can be customized using `reports.summaryTemplate` in 
 1. Remove unnecessary defensive checks
 2. Use existing AvatarComponent
 
-📄 Full report saved to: .claude/code-review-reports/feature-auth+2025-12-05T10-30-00.md
+📄 Full report saved to: .claude/code-review-tools/reports/feature-auth+2025-12-05T10-30-00.md
 ```
 
 ### Saved Report Files
@@ -444,7 +444,7 @@ Full detailed reports are automatically saved to markdown files with:
 - Example: `feature-auth+2025-12-05T10-30-00.md`
 - Branch name is sanitized (only alphanumeric and hyphens)
 
-**Default location:** `.claude/code-review-reports/`
+**Default location:** `.claude/code-review-tools/reports/`
 - Configurable via `reportOutput.directory` in config
 - Directory is created automatically if it doesn't exist
 - Add to `.gitignore` if you don't want to commit reports
@@ -477,13 +477,13 @@ Full detailed reports are automatically saved to markdown files with:
 - All built-in rules will be used automatically
 
 **Custom rule not being applied:**
-- Check the file exists in `.claude/code-review-rules/`
-- Verify it's listed in `.claude/code-review-config.json`
+- Check the file exists in `.claude/code-review-tools/rules/`
+- Verify it's listed in `.claude/code-review-tools/config.json`
 - Ensure `enabled: true` (or field is omitted)
-- Check for JSON syntax errors with `jq .claude/code-review-config.json`
+- Check for JSON syntax errors with `jq .claude/code-review-tools/config.json`
 
 **"Invalid JSON" error:**
-- Validate your config with: `jq empty .claude/code-review-config.json`
+- Validate your config with: `jq empty .claude/code-review-tools/config.json`
 - Check for missing commas, brackets, or quotes
 - Review [config-schema.json](./config-schema.json) for correct structure
 
@@ -515,18 +515,19 @@ plugins/code-review/
     └── summary-template.md  # Template for terminal output
 
 .claude/                     # Your project (not in plugin)
-├── code-review-config.json  # Your config
-├── code-review-rules/       # Your custom rules
-│   ├── automation-opportunities.md
-│   ├── team-conventions.md
-│   └── security-checks.md
-├── code-review-templates/   # Your custom templates (optional)
-│   ├── custom-report-template.md
-│   └── custom-summary-template.md
-└── code-review-reports/     # Saved review reports (auto-generated)
-    ├── main+2025-12-04T14-23-10.md
-    ├── feature-auth+2025-12-05T10-30-00.md
-    └── bugfix-login+2025-12-05T15-45-22.md
+└── code-review-tools/
+    ├── config.json          # Your config
+    ├── rules/               # Your custom rules
+    │   ├── automation-opportunities.md
+    │   ├── team-conventions.md
+    │   └── security-checks.md
+    ├── templates/           # Your custom templates (optional)
+    │   ├── custom-report-template.md
+    │   └── custom-summary-template.md
+    └── reports/             # Saved review reports (auto-generated)
+        ├── main+2025-12-04T14-23-10.md
+        ├── feature-auth+2025-12-05T10-30-00.md
+        └── bugfix-login+2025-12-05T15-45-22.md
 ```
 
 ## Contributing

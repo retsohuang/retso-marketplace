@@ -34,7 +34,7 @@ You will receive a **JSON object** containing all review data:
     "rulesContent": "# Rules content...",
     "reportTemplate": "# Report template content...",
     "summaryTemplate": "# Summary template content...",
-    "outputDirectory": ".claude/code-review-reports",
+    "outputDirectory": ".claude/code-review-tools/reports",
     "maxConcurrentAgents": 0
   }
 }
@@ -53,18 +53,18 @@ You must:
 
 You'll receive the JSON object directly from the CLI. Extract these fields from `data`:
 
-| Field | Description |
-|-------|-------------|
-| `commits` | Array of commit objects with hash, author, date, subject, body |
-| `commitList` | Array of commit SHAs (strings) |
-| `branch` | Current git branch name |
-| `commitRange` | Git range string (e.g., "abc123..HEAD") |
-| `totalCommits` | Number of commits to review |
-| `rulesContent` | Concatenated code review rules |
-| `reportTemplate` | Template for the full report |
-| `summaryTemplate` | Template for terminal summary |
-| `outputDirectory` | Where to save the report file |
-| `maxConcurrentAgents` | Parallelization setting (0=unlimited, 1-20=batch size) |
+| Field                 | Description                                                    |
+| --------------------- | -------------------------------------------------------------- |
+| `commits`             | Array of commit objects with hash, author, date, subject, body |
+| `commitList`          | Array of commit SHAs (strings)                                 |
+| `branch`              | Current git branch name                                        |
+| `commitRange`         | Git range string (e.g., "abc123..HEAD")                        |
+| `totalCommits`        | Number of commits to review                                    |
+| `rulesContent`        | Concatenated code review rules                                 |
+| `reportTemplate`      | Template for the full report                                   |
+| `summaryTemplate`     | Template for terminal summary                                  |
+| `outputDirectory`     | Where to save the report file                                  |
+| `maxConcurrentAgents` | Parallelization setting (0=unlimited, 1-20=batch size)         |
 
 ## Processing Steps
 
@@ -349,19 +349,19 @@ Generate the terminal summary following the provided Summary Template.
 
 1. **Calculate values for each variable**:
 
-| Variable            | Description                              | Format/Calculation                                |
-| ------------------- | ---------------------------------------- | ------------------------------------------------- |
-| `{commitRange}`     | Git commit range being reviewed          | From input data (e.g., `abc123..HEAD`)           |
-| `{commits}`         | Total number of commits reviewed         | Count of commits in commitList                    |
-| `{files}`           | Total number of files changed            | Sum of filesChanged across all commits            |
-| `{issues}`          | Total number of issues found             | Total issues after deduplication                  |
-| `{agentCount}`      | Number of commit-reviewer agents spawned | Number of agents invoked (= commits count)        |
-| `{batchCount}`      | Number of batches processed              | See format below                                  |
-| `{maxConcurrent}`   | Max concurrent agents setting            | From input data                                   |
-| `{dedupLine}`       | Deduplication info (if applicable)       | See format below                                  |
-| `{topIssues}`       | List of top issue categories with counts | See format below                                  |
-| `{recommendations}` | List of key actionable recommendations   | See format below                                  |
-| `{outputFile}`      | Full path to the saved report file       | Full path where report was written                |
+| Variable            | Description                              | Format/Calculation                         |
+| ------------------- | ---------------------------------------- | ------------------------------------------ |
+| `{commitRange}`     | Git commit range being reviewed          | From input data (e.g., `abc123..HEAD`)     |
+| `{commits}`         | Total number of commits reviewed         | Count of commits in commitList             |
+| `{files}`           | Total number of files changed            | Sum of filesChanged across all commits     |
+| `{issues}`          | Total number of issues found             | Total issues after deduplication           |
+| `{agentCount}`      | Number of commit-reviewer agents spawned | Number of agents invoked (= commits count) |
+| `{batchCount}`      | Number of batches processed              | See format below                           |
+| `{maxConcurrent}`   | Max concurrent agents setting            | From input data                            |
+| `{dedupLine}`       | Deduplication info (if applicable)       | See format below                           |
+| `{topIssues}`       | List of top issue categories with counts | See format below                           |
+| `{recommendations}` | List of key actionable recommendations   | See format below                           |
+| `{outputFile}`      | Full path to the saved report file       | Full path where report was written         |
 
 2. **Format Special Variables**:
 
@@ -425,7 +425,7 @@ List 1-3 most important actionable recommendations:
 2. Replace manual user avatar rendering with existing UserAvatar component
 3. Fix type definitions for API responses instead of using type assertions
 
-📄 Full report saved to: .claude/code-review-reports/refactor-auth+2025-12-05T18-45-12.md
+📄 Full report saved to: .claude/code-review-tools/reports/refactor-auth+2025-12-05T18-45-12.md
 ```
 
 **CRITICAL OUTPUT RULES**:

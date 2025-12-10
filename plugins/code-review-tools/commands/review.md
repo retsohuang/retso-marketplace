@@ -62,7 +62,7 @@ Invoke the `report-writer` agent with the prepared JSON data directly. The CLI o
     "rulesContent": "...",
     "reportTemplate": "...",
     "summaryTemplate": "...",
-    "outputDirectory": ".claude/code-review-reports",
+    "outputDirectory": ".claude/code-review-tools/reports",
     "maxConcurrentAgents": 0
   }
 }
