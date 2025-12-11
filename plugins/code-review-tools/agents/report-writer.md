@@ -341,13 +341,18 @@ Before writing the report file, verify:
 
 ### 7. Generate Terminal Summary
 
-Generate the terminal summary following the provided Summary Template.
+**CRITICAL**: Follow the Summary Template EXACTLY as provided.
 
-**The Summary Template is a pure template** — use it directly as the output format by replacing all variable placeholders with calculated values.
+**Template Usage**:
+1. The Summary Template provided contains ONLY the template structure with placeholders
+2. This is your authoritative format specification - follow it precisely
+3. Replace all placeholders with calculated values
+4. Do NOT add any content not shown in the template
+5. Do NOT deviate from the structure or formatting
 
-**Process**:
+---
 
-1. **Calculate values for each variable**:
+**Variable Reference Table**:
 
 | Variable            | Description                              | Format/Calculation                         |
 | ------------------- | ---------------------------------------- | ------------------------------------------ |
@@ -363,7 +368,9 @@ Generate the terminal summary following the provided Summary Template.
 | `{recommendations}` | List of key actionable recommendations   | See format below                           |
 | `{outputFile}`      | Full path to the saved report file       | Full path where report was written         |
 
-2. **Format Special Variables**:
+---
+
+**Special Variable Formatting Rules**:
 
 **{batchCount} Format**:
 - If `maxConcurrentAgents = 0`: Use `"1 batch (unlimited)"`
@@ -394,44 +401,35 @@ List 1-3 most important actionable recommendations:
 - Focus on high-impact or recurring issues
 - Omit commit references (they're in the full report)
 
-3. **Replace all placeholders** in the template with calculated values
+---
 
-4. **Clean up formatting**:
-   - If `{dedupLine}` is empty, remove that entire line (including the newline)
-   - Ensure proper spacing and line breaks
-   - Summary should be 15-20 lines max (fits in terminal view)
+**Formatting Cleanup**:
+- If `{dedupLine}` is empty, remove that entire line (including the newline)
+- Ensure proper spacing and line breaks
+- Summary should be 15-20 lines max (fits in terminal view)
+- **Preserve ALL emojis and special characters** from the template exactly as shown (e.g., 📄 emoji must appear in output)
 
-**Example Output**:
-
-```markdown
-## Code Review Summary: refactor-auth..HEAD
-
-| Commits | Files | Issues |
-| ------- | ----- | ------ |
-| 8       | 45    | 12     |
-
-**Review Process:**
-- Reviewed 8 commits using 8 commit-reviewer agents
-- Processed in 1 batch (unlimited) (maxConcurrentAgents: 0)
-- 3 duplicate issue(s) removed
-
-**Top Issues:**
-- 💡 Missed Component Reuse: 7
-- 🧹 AI Slop: 3
-- ⚠️ Component Extraction Issues: 2
-
-**Key Recommendations:**
-1. Consolidate repeated auth form patterns into a shared AuthForm component
-2. Replace manual user avatar rendering with existing UserAvatar component
-3. Fix type definitions for API responses instead of using type assertions
-
-📄 Full report saved to: .claude/code-review-tools/reports/refactor-auth+2025-12-05T18-45-12.md
-```
+---
 
 **CRITICAL OUTPUT RULES**:
 - Return ONLY the formatted summary (following the template)
 - DO NOT add conversational preambles or explanations
 - DO NOT use prose format - stick to the template structure exactly
 - The template defines the exact format - follow it precisely
+- **IMPORTANT**: Preserve the 📄 emoji before "Full report saved to:" - it must appear in your output exactly as shown in the template
 - The full report has already been written to the file
+
+---
+
+**Example of Correct vs Incorrect Output**:
+
+❌ WRONG - Missing emoji:
+```
+Full report saved to: /path/to/report.md
+```
+
+✅ CORRECT - Emoji preserved from template:
+```
+📄 Full report saved to: /path/to/report.md
+```
 

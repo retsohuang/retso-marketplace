@@ -134,8 +134,8 @@ The marketplace is configured in `.claude-plugin/marketplace.json`. Key fields:
 ## Available Plugins
 
 | Plugin Name | Description | Version |
-|-------------|-------------|---------||
-| [code-review](./plugins/code-review/README.md) | Review code changes commit-by-commit with custom rules support. Includes interactive setup and rule creation. | 2.0.0 |
+|-------------|-------------|---------|
+| [code-review](./plugins/code-review/README.md) | Review code changes commit-by-commit with custom rules support. Includes interactive setup and rule creation. | 2.1.0 |
 
 ## Contributing
 
