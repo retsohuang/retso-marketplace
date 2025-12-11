@@ -7,6 +7,7 @@ import {
   type PromiseFsClient,
 } from "isomorphic-git"
 import * as nodeFs from "node:fs"
+import { fileURLToPath } from "node:url"
 import { join } from "node:path"
 import {
   DEFAULT_CONFIG,
@@ -52,15 +53,16 @@ function error(message: string): ErrorOutput {
 }
 
 function loadConfig(
-  configPath: string = ".claude/code-review-tools/config.json",
+  configPath: string | undefined = undefined,
   fs: FsLike = defaultFs,
 ): Output<ReviewConfig> {
+  const actualConfigPath = configPath ?? ".claude/code-review-tools/config.json"
   try {
-    if (!fs.existsSync(configPath)) {
+    if (!fs.existsSync(actualConfigPath)) {
       return success(DEFAULT_CONFIG)
     }
 
-    const userConfig = JSON.parse(fs.readFileSync(configPath, "utf-8"))
+    const userConfig = JSON.parse(fs.readFileSync(actualConfigPath, "utf-8"))
     const config = parseConfig(userConfig)
 
     return success(config)
@@ -150,6 +152,7 @@ function buildRules(
   config: ReviewConfig,
   pluginRoot: string,
   fs: FsLike = defaultFs,
+  pluginFs: FsLike = defaultFs,
 ): Output<BuildRulesResult> {
   try {
     const rulesSections: string[] = []
@@ -176,8 +179,8 @@ function buildRules(
     for (const rule of builtInRules) {
       if (config.builtInRules?.[rule.key]) {
         const rulePath = join(pluginRoot, "rules", rule.file)
-        if (fs.existsSync(rulePath)) {
-          const content = fs.readFileSync(rulePath, "utf-8")
+        if (pluginFs.existsSync(rulePath)) {
+          const content = pluginFs.readFileSync(rulePath, "utf-8")
           rulesSections.push(`# ${rule.name} Rules\n\n${content}\n\n---\n`)
           enabledCount++
         }
@@ -228,23 +231,27 @@ function loadTemplate(
   pluginRoot: string,
   defaultTemplateName: string,
   fs: FsLike = defaultFs,
+  pluginFs: FsLike = defaultFs,
 ): string {
   let templatePath: string
+  let usePluginFs = false
 
   if (customTemplate) {
     templatePath = `.claude/code-review-tools/templates/${customTemplate}`
   } else {
     templatePath = `${pluginRoot}/templates/${defaultTemplateName}`
+    usePluginFs = true
   }
 
-  if (fs.existsSync(templatePath)) {
-    return fs.readFileSync(templatePath, "utf-8")
+  const fsToUse = usePluginFs ? pluginFs : fs
+  if (fsToUse.existsSync(templatePath)) {
+    return fsToUse.readFileSync(templatePath, "utf-8")
   }
 
   const defaultPath = `${pluginRoot}/templates/${defaultTemplateName}`
-  if (fs.existsSync(defaultPath)) {
+  if (pluginFs.existsSync(defaultPath)) {
     console.error(`WARNING: Template not found: ${templatePath}, using default`)
-    return fs.readFileSync(defaultPath, "utf-8")
+    return pluginFs.readFileSync(defaultPath, "utf-8")
   }
 
   throw new Error(`Template not found: ${defaultPath}`)
@@ -255,6 +262,7 @@ async function prepareReview(
   pluginRoot: string,
   dir: string = DEFAULT_DIR,
   fs: FsLike = defaultFs,
+  pluginFs: FsLike = defaultFs,
 ): Promise<Output<PrepareReviewResult>> {
   try {
     const configResult = loadConfig(undefined, fs)
@@ -268,7 +276,7 @@ async function prepareReview(
       return error(`Failed to collect commits: ${commitsResult.error}`)
     }
 
-    const rulesResult = buildRules(config, pluginRoot, fs)
+    const rulesResult = buildRules(config, pluginRoot, fs, pluginFs)
     if (!rulesResult.success) {
       return error(`Failed to build rules: ${rulesResult.error}`)
     }
@@ -278,12 +286,14 @@ async function prepareReview(
       pluginRoot,
       "report-template.md",
       fs,
+      pluginFs,
     )
     const summaryTemplate = loadTemplate(
       config.reports?.summaryTemplate,
       pluginRoot,
       "summary-template.md",
       fs,
+      pluginFs,
     )
 
     return success({
@@ -405,7 +415,7 @@ async function main(): Promise<void> {
   }
 }
 
-if (import.meta.url.endsWith(process.argv[1])) {
+if (fileURLToPath(import.meta.url) === process.argv[1]) {
   main().catch((err) => {
     console.error("Fatal error:", (err as Error).message)
     process.exit(1)

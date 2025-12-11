@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { add, commit, init, setConfig } from "isomorphic-git"
 import { Volume, createFsFromVolume } from "memfs"
+import * as nodeFs from "node:fs"
 import { join } from "node:path"
 import {
   collectCommits,
@@ -10,6 +11,15 @@ import {
 } from "../src/cli.js"
 
 const PLUGIN_ROOT = join(__dirname, "../../")
+
+// Real filesystem for reading plugin files
+const realFs: FsLike = {
+  promises: nodeFs.promises,
+  existsSync: nodeFs.existsSync,
+  readFileSync: nodeFs.readFileSync,
+  writeFileSync: nodeFs.writeFileSync,
+  mkdirSync: nodeFs.mkdirSync,
+} as FsLike
 
 let fs: FsLike
 let vol: Volume
@@ -67,34 +77,6 @@ beforeEach(async () => {
   })
 
   testCommits = [commit3, commit2, commit1]
-
-  const pluginRulesDir = join(PLUGIN_ROOT, "rules")
-  const pluginTemplatesDir = join(PLUGIN_ROOT, "templates")
-
-  fs.mkdirSync(pluginRulesDir, { recursive: true })
-  fs.mkdirSync(pluginTemplatesDir, { recursive: true })
-
-  fs.writeFileSync(
-    join(pluginRulesDir, "component-extraction-rules.md"),
-    "# Component Extraction Rules\nVerify component extraction.",
-  )
-  fs.writeFileSync(
-    join(pluginRulesDir, "component-reuse-rules.md"),
-    "# Component Reuse Rules\nCheck for reuse opportunities.",
-  )
-  fs.writeFileSync(
-    join(pluginRulesDir, "ai-slop-rules.md"),
-    "# AI Slop Rules\nDetect AI patterns.",
-  )
-
-  fs.writeFileSync(
-    join(pluginTemplatesDir, "report-template.md"),
-    "# Report Template\n{commitRange}",
-  )
-  fs.writeFileSync(
-    join(pluginTemplatesDir, "summary-template.md"),
-    "# Summary Template\n{commits}",
-  )
 })
 
 afterEach(() => {
@@ -223,7 +205,13 @@ describe("prepareReview", () => {
   test("prepares review data successfully with default config", async () => {
     const startCommit = testCommits[1].slice(0, 7)
 
-    const result = await prepareReview(startCommit, PLUGIN_ROOT, TEST_DIR, fs)
+    const result = await prepareReview(
+      startCommit,
+      PLUGIN_ROOT,
+      TEST_DIR,
+      fs,
+      realFs,
+    )
 
     expect(result.success).toBe(true)
     if (result.success) {
@@ -267,7 +255,13 @@ describe("prepareReview", () => {
 
     const startCommit = testCommits[1].slice(0, 7)
 
-    const result = await prepareReview(startCommit, PLUGIN_ROOT, TEST_DIR, fs)
+    const result = await prepareReview(
+      startCommit,
+      PLUGIN_ROOT,
+      TEST_DIR,
+      fs,
+      realFs,
+    )
 
     expect(result.success).toBe(true)
     if (result.success) {
@@ -282,7 +276,13 @@ describe("prepareReview", () => {
   test("returns correct commit list", async () => {
     const startCommit = testCommits[2].slice(0, 7)
 
-    const result = await prepareReview(startCommit, PLUGIN_ROOT, TEST_DIR, fs)
+    const result = await prepareReview(
+      startCommit,
+      PLUGIN_ROOT,
+      TEST_DIR,
+      fs,
+      realFs,
+    )
 
     expect(result.success).toBe(true)
     if (result.success) {
@@ -292,7 +292,13 @@ describe("prepareReview", () => {
   })
 
   test("returns error for invalid commit", async () => {
-    const result = await prepareReview("invalid", PLUGIN_ROOT, TEST_DIR, fs)
+    const result = await prepareReview(
+      "invalid",
+      PLUGIN_ROOT,
+      TEST_DIR,
+      fs,
+      realFs,
+    )
 
     expect(result.success).toBe(false)
     if (!result.success) {
@@ -301,7 +307,7 @@ describe("prepareReview", () => {
   })
 })
 
-describe("CLI integration (help commands)", () => {
+describe("module exports", () => {
   test("CLI exports are available", () => {
     expect(prepareReview).toBeDefined()
     expect(collectCommits).toBeDefined()
