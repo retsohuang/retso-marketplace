@@ -1,13 +1,25 @@
 #!/usr/bin/env node
 
-import { existsSync, readFileSync } from "node:fs"
-import { join } from "node:path"
-import simpleGit, { type GitResponseError, type SimpleGit } from "simple-git"
 import {
-  type ReviewConfig,
+  currentBranch,
+  log,
+  readCommit,
+  type PromiseFsClient,
+} from "isomorphic-git"
+import nodeFs from "node:fs"
+import { join } from "node:path"
+import {
   DEFAULT_CONFIG,
   parseConfig,
+  type ReviewConfig,
 } from "./config-schema.js"
+
+const DEFAULT_DIR = process.cwd()
+
+interface FsLike extends PromiseFsClient {
+  existsSync(path: string): boolean
+  readFileSync(path: string, encoding: BufferEncoding): string
+}
 
 interface SuccessOutput<T = unknown> {
   success: true
@@ -29,15 +41,18 @@ function error(message: string): ErrorOutput {
   return { success: false, error: message }
 }
 
-function loadConfig(configPath?: string): Output<ReviewConfig> {
+function loadConfig(
+  configPath?: string,
+  fs: FsLike = nodeFs,
+): Output<ReviewConfig> {
   const path = configPath || ".claude/code-review-tools/config.json"
 
   try {
-    if (!existsSync(path)) {
+    if (!fs.existsSync(path)) {
       return success(DEFAULT_CONFIG)
     }
 
-    const userConfig = JSON.parse(readFileSync(path, "utf-8"))
+    const userConfig = JSON.parse(fs.readFileSync(path, "utf-8"))
     const config = parseConfig(userConfig)
 
     return success(config)
@@ -63,65 +78,58 @@ interface CollectCommitsResult {
 
 async function collectCommits(
   commitHash: string,
+  dir: string = DEFAULT_DIR,
+  fs: FsLike = nodeFs,
 ): Promise<Output<CollectCommitsResult>> {
   try {
-    const git: SimpleGit = simpleGit({ baseDir: process.cwd() })
-    const branch = await git.revparse(["--abbrev-ref", "HEAD"])
+    const branch = (await currentBranch({ fs, dir })) ?? "HEAD"
+    const allCommits = await log({ fs, dir, ref: "HEAD" })
 
-    // Verify the commit exists
-    try {
-      await git.revparse([commitHash])
-    } catch (err) {
+    const targetIndex = allCommits.findIndex((c) =>
+      c.oid.startsWith(commitHash),
+    )
+    if (targetIndex === -1) {
       return error(`Commit not found: ${commitHash}`)
     }
 
-    const log = await git.log({
-      from: commitHash,
-      to: "HEAD",
-      symmetric: false,
-    })
+    const commitsInRange = allCommits.slice(0, targetIndex + 1)
 
-    let startCommit = null
-    try {
-      const startLog = await git.log({
-        maxCount: 1,
-        [`${commitHash}^..${commitHash}`]: null,
-      })
-      startCommit = startLog.all[0]
-    } catch {
-      const singleLog = await git.log({ maxCount: 1, [commitHash]: null })
-      startCommit = singleLog.all[0]
-    }
-
-    const allCommits = [...log.all, ...(startCommit ? [startCommit] : [])]
-
-    if (allCommits.length === 0) {
+    if (commitsInRange.length === 0) {
       return success({
         commits: [],
-        branch: branch.trim(),
+        branch,
         commitRange: `${commitHash}^..HEAD`,
         totalCommits: 0,
       })
     }
 
-    const commits: CommitInfo[] = allCommits.map((commit) => ({
-      hash: commit.hash,
-      author: commit.author_name,
-      date: commit.date.split(" ")[0],
-      subject: commit.message.split("\n")[0],
-      body: commit.body?.trim() || undefined,
-    }))
+    const commits: CommitInfo[] = []
+    for (const commitObj of commitsInRange) {
+      const commitData = await readCommit({ fs, dir, oid: commitObj.oid })
+      const message = commitData.commit.message
+      const lines = message.split("\n")
+      const subject = lines[0]
+      const body = lines.slice(1).join("\n").trim() || undefined
+
+      commits.push({
+        hash: commitObj.oid,
+        author: commitData.commit.author.name,
+        date: new Date(commitData.commit.author.timestamp * 1000)
+          .toISOString()
+          .split("T")[0],
+        subject,
+        body,
+      })
+    }
 
     return success({
-      commits,
-      branch: branch.trim(),
+      commits: commits.reverse(),
+      branch,
       commitRange: `${commitHash}^..HEAD`,
       totalCommits: commits.length,
     })
   } catch (err) {
-    return error(
-      `Failed to collect commits: ${(err as GitResponseError).message}`,
-    )
+    return error(`Failed to collect commits: ${(err as Error).message}`)
   }
 }
 
@@ -133,6 +141,7 @@ interface BuildRulesResult {
 function buildRules(
   config: ReviewConfig,
   pluginRoot: string,
+  fs: FsLike = nodeFs,
 ): Output<BuildRulesResult> {
   try {
     const rulesSections: string[] = []
@@ -159,8 +168,8 @@ function buildRules(
     for (const rule of builtInRules) {
       if (config.builtInRules?.[rule.key]) {
         const rulePath = join(pluginRoot, "rules", rule.file)
-        if (existsSync(rulePath)) {
-          const content = readFileSync(rulePath, "utf-8")
+        if (fs.existsSync(rulePath)) {
+          const content = fs.readFileSync(rulePath, "utf-8")
           rulesSections.push(`# ${rule.name} Rules\n\n${content}\n\n---\n`)
           enabledCount++
         }
@@ -170,8 +179,8 @@ function buildRules(
     for (const rule of config.customRules ?? []) {
       if (rule.enabled) {
         const rulePath = `.claude/code-review-tools/rules/${rule.file}`
-        if (existsSync(rulePath)) {
-          const content = readFileSync(rulePath, "utf-8")
+        if (fs.existsSync(rulePath)) {
+          const content = fs.readFileSync(rulePath, "utf-8")
           rulesSections.push(`# ${rule.name} Rules\n\n${content}\n\n---\n`)
           enabledCount++
         } else {
@@ -210,6 +219,7 @@ function loadTemplate(
   customTemplate: string | undefined,
   pluginRoot: string,
   defaultTemplateName: string,
+  fs: FsLike = nodeFs,
 ): string {
   let templatePath: string
 
@@ -219,14 +229,14 @@ function loadTemplate(
     templatePath = `${pluginRoot}/templates/${defaultTemplateName}`
   }
 
-  if (existsSync(templatePath)) {
-    return readFileSync(templatePath, "utf-8")
+  if (fs.existsSync(templatePath)) {
+    return fs.readFileSync(templatePath, "utf-8")
   }
 
   const defaultPath = `${pluginRoot}/templates/${defaultTemplateName}`
-  if (existsSync(defaultPath)) {
+  if (fs.existsSync(defaultPath)) {
     console.error(`WARNING: Template not found: ${templatePath}, using default`)
-    return readFileSync(defaultPath, "utf-8")
+    return fs.readFileSync(defaultPath, "utf-8")
   }
 
   throw new Error(`Template not found: ${defaultPath}`)
@@ -235,20 +245,22 @@ function loadTemplate(
 async function prepareReview(
   commitHash: string,
   pluginRoot: string,
+  dir: string = DEFAULT_DIR,
+  fs: FsLike = nodeFs,
 ): Promise<Output<PrepareReviewResult>> {
   try {
-    const configResult = loadConfig()
+    const configResult = loadConfig(undefined, fs)
     if (!configResult.success) {
       return error(`Failed to load config: ${configResult.error}`)
     }
     const config = configResult.data
 
-    const commitsResult = await collectCommits(commitHash)
+    const commitsResult = await collectCommits(commitHash, dir, fs)
     if (!commitsResult.success) {
       return error(`Failed to collect commits: ${commitsResult.error}`)
     }
 
-    const rulesResult = buildRules(config, pluginRoot)
+    const rulesResult = buildRules(config, pluginRoot, fs)
     if (!rulesResult.success) {
       return error(`Failed to build rules: ${rulesResult.error}`)
     }
@@ -257,11 +269,13 @@ async function prepareReview(
       config.reports?.template,
       pluginRoot,
       "report-template.md",
+      fs,
     )
     const summaryTemplate = loadTemplate(
       config.reports?.summaryTemplate,
       pluginRoot,
       "summary-template.md",
+      fs,
     )
 
     return success({
@@ -318,6 +332,19 @@ function parseArgs(args: string[]): Record<string, string | boolean> {
   return parsed
 }
 
+export {
+  buildRules,
+  collectCommits,
+  loadConfig,
+  loadTemplate,
+  prepareReview,
+  type CollectCommitsResult,
+  type CommitInfo,
+  type FsLike,
+  type Output,
+  type PrepareReviewResult,
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2)
 
@@ -370,7 +397,9 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((err) => {
-  console.error("Fatal error:", (err as Error).message)
-  process.exit(1)
-})
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((err) => {
+    console.error("Fatal error:", (err as Error).message)
+    process.exit(1)
+  })
+}

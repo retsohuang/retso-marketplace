@@ -11,7 +11,7 @@
     {
       "name": "code-review-tools",
       "description": "Review code changes commit-by-commit with custom rules support. Includes interactive setup and rule creation.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "source": "./plugins/code-review-tools",
       "author": {
         "name": "Retso Huang",
