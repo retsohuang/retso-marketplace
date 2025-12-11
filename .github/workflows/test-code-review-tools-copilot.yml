@@ -52,11 +52,12 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: '🤖 Running code review tools tests... Check the [workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'
+              body: `🤖 Running code review tools tests... Check the [workflow run](${runUrl}) for details.`
             });
 
   test:
@@ -164,6 +165,7 @@ jobs:
               message = 'Tests were cancelled.';
             }
             
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             const body = `${emoji} **Code Review Tools Test Results**
 
             **Unit Tests:** ${testResult === 'success' ? '✅ Passed' : testResult === 'failure' ? '❌ Failed' : '⚠️ ' + testResult}
@@ -171,11 +173,11 @@ jobs:
 
             ${message}
 
-            [View workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+            [View workflow run](${runUrl})`;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.payload.issue.number,
+              issue_number: context.issue.number,
               body: body
             });
