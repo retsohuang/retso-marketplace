@@ -17,6 +17,10 @@ import {
 
 const DEFAULT_DIR = process.cwd()
 
+// FsLike combines isomorphic-git's PromiseFsClient (async) with common sync methods
+// This hybrid approach is needed because:
+// - isomorphic-git requires PromiseFsClient for git operations
+// - Sync methods are used for convenience in config loading and file checks
 interface FsLike extends PromiseFsClient {
   existsSync(path: string): boolean
   readFileSync(path: string, encoding: BufferEncoding): string
@@ -26,10 +30,10 @@ interface FsLike extends PromiseFsClient {
 
 const defaultFs: FsLike = {
   promises: nodeFs.promises,
-  existsSync: nodeFs.existsSync,
-  readFileSync: nodeFs.readFileSync,
-  writeFileSync: nodeFs.writeFileSync,
-  mkdirSync: nodeFs.mkdirSync,
+  existsSync: nodeFs.existsSync.bind(nodeFs),
+  readFileSync: nodeFs.readFileSync.bind(nodeFs),
+  writeFileSync: nodeFs.writeFileSync.bind(nodeFs),
+  mkdirSync: nodeFs.mkdirSync.bind(nodeFs),
 } as FsLike
 
 interface SuccessOutput<T = unknown> {
@@ -393,6 +397,9 @@ async function main(): Promise<void> {
         const result = await prepareReview(
           parsedArgs.positional as string,
           parsedArgs.pluginRoot as string,
+          DEFAULT_DIR,
+          defaultFs,
+          defaultFs,
         )
 
         if (!result.success) {
