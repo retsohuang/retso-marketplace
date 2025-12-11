@@ -164,6 +164,21 @@ describe("collectCommits", () => {
       expect(commitInfo.subject).toBeDefined()
     }
   })
+
+  test("collects commits when called from a subdirectory", async () => {
+    const subDir = join(TEST_DIR, "packages/app")
+    fs.mkdirSync(subDir, { recursive: true })
+
+    const startCommit = testCommits[1].slice(0, 7)
+    const result = await collectCommits(startCommit, subDir, fs)
+
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.totalCommits).toBe(2)
+      expect(result.data.commits).toHaveLength(2)
+      expect(result.data.branch).toBe("main")
+    }
+  })
 })
 
 describe("loadConfig", () => {

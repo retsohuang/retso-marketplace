@@ -29659,8 +29659,9 @@ function loadConfig(configPath = ".claude/code-review-tools/config.json", fs = d
 }
 async function collectCommits(commitHash, dir = DEFAULT_DIR, fs = defaultFs) {
   try {
-    const branch = await import_isomorphic_git.currentBranch({ fs, dir }) ?? "HEAD";
-    const allCommits = await import_isomorphic_git.log({ fs, dir, ref: "HEAD" });
+    const gitDir = await import_isomorphic_git.findRoot({ fs, filepath: dir });
+    const branch = await import_isomorphic_git.currentBranch({ fs, dir: gitDir }) ?? "HEAD";
+    const allCommits = await import_isomorphic_git.log({ fs, dir: gitDir, ref: "HEAD" });
     const targetIndex = allCommits.findIndex((c) => c.oid.startsWith(commitHash));
     if (targetIndex === -1) {
       return error46(`Commit not found: ${commitHash}`);
@@ -29676,7 +29677,11 @@ async function collectCommits(commitHash, dir = DEFAULT_DIR, fs = defaultFs) {
     }
     const commits = [];
     for (const commitObj of commitsInRange) {
-      const commitData = await import_isomorphic_git.readCommit({ fs, dir, oid: commitObj.oid });
+      const commitData = await import_isomorphic_git.readCommit({
+        fs,
+        dir: gitDir,
+        oid: commitObj.oid
+      });
       const message = commitData.commit.message;
       const lines = message.split(`
 `);

@@ -2,6 +2,7 @@
 
 import {
   currentBranch,
+  findRoot,
   log,
   readCommit,
   type PromiseFsClient,
@@ -90,8 +91,9 @@ async function collectCommits(
   fs: FsLike = defaultFs,
 ): Promise<Output<CollectCommitsResult>> {
   try {
-    const branch = (await currentBranch({ fs, dir })) ?? "HEAD"
-    const allCommits = await log({ fs, dir, ref: "HEAD" })
+    const gitDir = await findRoot({ fs, filepath: dir })
+    const branch = (await currentBranch({ fs, dir: gitDir })) ?? "HEAD"
+    const allCommits = await log({ fs, dir: gitDir, ref: "HEAD" })
 
     const targetIndex = allCommits.findIndex((c) =>
       c.oid.startsWith(commitHash),
@@ -113,7 +115,11 @@ async function collectCommits(
 
     const commits: CommitInfo[] = []
     for (const commitObj of commitsInRange) {
-      const commitData = await readCommit({ fs, dir, oid: commitObj.oid })
+      const commitData = await readCommit({
+        fs,
+        dir: gitDir,
+        oid: commitObj.oid,
+      })
       const message = commitData.commit.message
       const lines = message.split("\n")
       const subject = lines[0]
