@@ -6,7 +6,7 @@ import {
   readCommit,
   type PromiseFsClient,
 } from "isomorphic-git"
-import nodeFs from "node:fs"
+import * as nodeFs from "node:fs"
 import { join } from "node:path"
 import {
   DEFAULT_CONFIG,
@@ -19,7 +19,17 @@ const DEFAULT_DIR = process.cwd()
 interface FsLike extends PromiseFsClient {
   existsSync(path: string): boolean
   readFileSync(path: string, encoding: BufferEncoding): string
+  writeFileSync(path: string, data: string): void
+  mkdirSync(path: string, options?: { recursive?: boolean }): void
 }
+
+const defaultFs: FsLike = {
+  promises: nodeFs.promises,
+  existsSync: nodeFs.existsSync,
+  readFileSync: nodeFs.readFileSync,
+  writeFileSync: nodeFs.writeFileSync,
+  mkdirSync: nodeFs.mkdirSync,
+} as FsLike
 
 interface SuccessOutput<T = unknown> {
   success: true
@@ -42,17 +52,15 @@ function error(message: string): ErrorOutput {
 }
 
 function loadConfig(
-  configPath?: string,
-  fs: FsLike = nodeFs,
+  configPath: string = ".claude/code-review-tools/config.json",
+  fs: FsLike = defaultFs,
 ): Output<ReviewConfig> {
-  const path = configPath || ".claude/code-review-tools/config.json"
-
   try {
-    if (!fs.existsSync(path)) {
+    if (!fs.existsSync(configPath)) {
       return success(DEFAULT_CONFIG)
     }
 
-    const userConfig = JSON.parse(fs.readFileSync(path, "utf-8"))
+    const userConfig = JSON.parse(fs.readFileSync(configPath, "utf-8"))
     const config = parseConfig(userConfig)
 
     return success(config)
@@ -79,7 +87,7 @@ interface CollectCommitsResult {
 async function collectCommits(
   commitHash: string,
   dir: string = DEFAULT_DIR,
-  fs: FsLike = nodeFs,
+  fs: FsLike = defaultFs,
 ): Promise<Output<CollectCommitsResult>> {
   try {
     const branch = (await currentBranch({ fs, dir })) ?? "HEAD"
@@ -141,7 +149,7 @@ interface BuildRulesResult {
 function buildRules(
   config: ReviewConfig,
   pluginRoot: string,
-  fs: FsLike = nodeFs,
+  fs: FsLike = defaultFs,
 ): Output<BuildRulesResult> {
   try {
     const rulesSections: string[] = []
@@ -219,7 +227,7 @@ function loadTemplate(
   customTemplate: string | undefined,
   pluginRoot: string,
   defaultTemplateName: string,
-  fs: FsLike = nodeFs,
+  fs: FsLike = defaultFs,
 ): string {
   let templatePath: string
 
@@ -246,7 +254,7 @@ async function prepareReview(
   commitHash: string,
   pluginRoot: string,
   dir: string = DEFAULT_DIR,
-  fs: FsLike = nodeFs,
+  fs: FsLike = defaultFs,
 ): Promise<Output<PrepareReviewResult>> {
   try {
     const configResult = loadConfig(undefined, fs)
@@ -397,7 +405,7 @@ async function main(): Promise<void> {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url.endsWith(process.argv[1])) {
   main().catch((err) => {
     console.error("Fatal error:", (err as Error).message)
     process.exit(1)

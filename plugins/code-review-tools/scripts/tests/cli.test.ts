@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { add, commit, init, setConfig } from "isomorphic-git"
-import { Volume } from "memfs"
+import { Volume, createFsFromVolume } from "memfs"
 import { join } from "node:path"
 import {
   collectCommits,
@@ -11,14 +11,27 @@ import {
 
 const PLUGIN_ROOT = join(__dirname, "../../")
 
-let fs: FsLike & Volume
+let fs: FsLike
+let vol: Volume
 let testCommits: string[] = []
 const TEST_DIR = "/repo"
 
 beforeEach(async () => {
-  fs = new Volume() as FsLike & Volume
+  vol = new Volume()
+  const memfsInstance = createFsFromVolume(vol)
 
-  await init({ fs, dir: TEST_DIR })
+  // Create FsLike by combining memfs with sync methods
+  fs = {
+    promises: memfsInstance.promises,
+    existsSync: memfsInstance.existsSync.bind(memfsInstance),
+    readFileSync: memfsInstance.readFileSync.bind(memfsInstance),
+    writeFileSync: memfsInstance.writeFileSync.bind(memfsInstance),
+    mkdirSync: memfsInstance.mkdirSync.bind(memfsInstance),
+  } as FsLike
+
+  vol.mkdirSync(TEST_DIR, { recursive: true })
+
+  await init({ fs, dir: TEST_DIR, defaultBranch: "main" })
   await setConfig({
     fs,
     dir: TEST_DIR,
@@ -26,8 +39,6 @@ beforeEach(async () => {
     value: "test@example.com",
   })
   await setConfig({ fs, dir: TEST_DIR, path: "user.name", value: "Test User" })
-
-  fs.mkdirSync(TEST_DIR, { recursive: true })
   fs.writeFileSync(join(TEST_DIR, "file1.txt"), "initial content")
   await add({ fs, dir: TEST_DIR, filepath: "file1.txt" })
   const commit1 = await commit({
@@ -87,7 +98,7 @@ beforeEach(async () => {
 })
 
 afterEach(() => {
-  fs.reset()
+  vol.reset()
 })
 
 describe("collectCommits", () => {
@@ -100,7 +111,7 @@ describe("collectCommits", () => {
     if (result.success) {
       expect(result.data.totalCommits).toBe(2)
       expect(result.data.commits).toHaveLength(2)
-      expect(result.data.branch).toBe("master")
+      expect(result.data.branch).toBe("main")
       expect(result.data.commitRange).toContain("..")
     }
   })

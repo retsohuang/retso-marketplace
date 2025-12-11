@@ -17004,7 +17004,7 @@ gpgsig`));
 
 // src/cli.ts
 var import_isomorphic_git = __toESM(require_isomorphic_git(), 1);
-import nodeFs from "node:fs";
+import * as nodeFs from "node:fs";
 import { join } from "node:path";
 
 // node_modules/zod/v4/classic/external.js
@@ -29632,26 +29632,32 @@ function parseConfig(input) {
 
 // src/cli.ts
 var DEFAULT_DIR = process.cwd();
+var defaultFs = {
+  promises: nodeFs.promises,
+  existsSync: nodeFs.existsSync,
+  readFileSync: nodeFs.readFileSync,
+  writeFileSync: nodeFs.writeFileSync,
+  mkdirSync: nodeFs.mkdirSync
+};
 function success2(data) {
   return { success: true, data };
 }
 function error46(message) {
   return { success: false, error: message };
 }
-function loadConfig(configPath, fs = nodeFs) {
-  const path = configPath || ".claude/code-review-tools/config.json";
+function loadConfig(configPath = ".claude/code-review-tools/config.json", fs = defaultFs) {
   try {
-    if (!fs.existsSync(path)) {
+    if (!fs.existsSync(configPath)) {
       return success2(DEFAULT_CONFIG);
     }
-    const userConfig = JSON.parse(fs.readFileSync(path, "utf-8"));
+    const userConfig = JSON.parse(fs.readFileSync(configPath, "utf-8"));
     const config2 = parseConfig(userConfig);
     return success2(config2);
   } catch (err) {
     return error46(`Failed to load config: ${err.message}`);
   }
 }
-async function collectCommits(commitHash, dir = DEFAULT_DIR, fs = nodeFs) {
+async function collectCommits(commitHash, dir = DEFAULT_DIR, fs = defaultFs) {
   try {
     const branch = await import_isomorphic_git.currentBranch({ fs, dir }) ?? "HEAD";
     const allCommits = await import_isomorphic_git.log({ fs, dir, ref: "HEAD" });
@@ -29695,7 +29701,7 @@ async function collectCommits(commitHash, dir = DEFAULT_DIR, fs = nodeFs) {
     return error46(`Failed to collect commits: ${err.message}`);
   }
 }
-function buildRules(config2, pluginRoot, fs = nodeFs) {
+function buildRules(config2, pluginRoot, fs = defaultFs) {
   try {
     const rulesSections = [];
     let enabledCount = 0;
@@ -29760,7 +29766,7 @@ ${content}
     return error46(`Failed to build rules: ${err.message}`);
   }
 }
-function loadTemplate(customTemplate, pluginRoot, defaultTemplateName, fs = nodeFs) {
+function loadTemplate(customTemplate, pluginRoot, defaultTemplateName, fs = defaultFs) {
   let templatePath;
   if (customTemplate) {
     templatePath = `.claude/code-review-tools/templates/${customTemplate}`;
@@ -29777,7 +29783,7 @@ function loadTemplate(customTemplate, pluginRoot, defaultTemplateName, fs = node
   }
   throw new Error(`Template not found: ${defaultPath}`);
 }
-async function prepareReview(commitHash, pluginRoot, dir = DEFAULT_DIR, fs = nodeFs) {
+async function prepareReview(commitHash, pluginRoot, dir = DEFAULT_DIR, fs = defaultFs) {
   try {
     const configResult = loadConfig(undefined, fs);
     if (!configResult.success) {
@@ -29879,7 +29885,7 @@ async function main() {
     process.exit(1);
   }
 }
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url.endsWith(process.argv[1])) {
   main().catch((err) => {
     console.error("Fatal error:", err.message);
     process.exit(1);
