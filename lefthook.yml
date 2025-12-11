@@ -4,14 +4,13 @@ pre-commit:
     # TypeScript/JavaScript - Linting
     js-lint:
       root: 'plugins/code-review-tools/scripts/'
-      glob: '*.{ts,js}'
+      glob: '**/*.{ts,js}'
       exclude: "(dist|node_modules|\\.claude)/.*"
       run: bunx oxlint {staged_files}
 
     # TypeScript/JavaScript - Formatting
     js-format:
       root: 'plugins/code-review-tools/scripts/'
-      glob: '*.{ts,js,json}'
+      glob: '**/*.{ts,js,json}'
       exclude: "(dist|node_modules|\\.claude)/.*"
       run: bunx prettier --write {staged_files}
-
