@@ -1,0 +1,181 @@
+name: Copilot Triggered Tests
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs: 
+  check-trigger:
+    name: Check for Copilot Trigger
+    runs-on: ubuntu-latest
+    if: |
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '@copilot please test')
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+      pr_ref: ${{ steps.pr.outputs.ref }}
+      pr_sha: ${{ steps.pr.outputs.sha }}
+    steps:
+      - name: Check trigger
+        id: check
+        run: echo "should_run=true" >> $GITHUB_OUTPUT
+
+      - name: Get PR details
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            core.setOutput('ref', pr.data.head.ref);
+            core.setOutput('sha', pr.data.head.sha);
+
+      - name: React to comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'rocket'
+            });
+
+      - name: Post starting message
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '🤖 Running code review tools tests... Check the [workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'
+            });
+
+  test:
+    name: Test on Node ${{ matrix.node-version }}
+    runs-on: ubuntu-latest
+    needs: check-trigger
+    if: needs.check-trigger.outputs.should_run == 'true'
+    strategy: 
+      matrix: 
+        node-version: [18, 20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.check-trigger.outputs.pr_sha }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        working-directory: plugins/code-review-tools/scripts
+        run: bun install
+
+      - name: Build
+        working-directory: plugins/code-review-tools/scripts
+        run: bun run build
+
+      - name: Run tests
+        working-directory: plugins/code-review-tools/scripts
+        run: bun test
+
+      - name: Type check
+        working-directory: plugins/code-review-tools/scripts
+        run: bun run typecheck
+
+      - name: Check dist/ is up to date
+        working-directory: plugins/code-review-tools/scripts
+        run: |
+          if ! git diff --exit-code dist/; then
+            echo "Error: dist/ is out of sync with src/"
+            echo "Please run 'bun run build' and commit the changes"
+            exit 1
+          fi
+
+  test-cli:
+    name: Test CLI on Node ${{ matrix.node-version }}
+    runs-on: ${{ matrix.os }}
+    needs: check-trigger
+    if: needs.check-trigger.outputs.should_run == 'true'
+    strategy:
+      matrix: 
+        os: [ubuntu-latest, macos-latest]
+        node-version: [18, 20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+        with: 
+          ref: ${{ needs.check-trigger.outputs.pr_sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        working-directory: plugins/code-review-tools/scripts
+        run: bun install
+
+      - name: Build
+        working-directory: plugins/code-review-tools/scripts
+        run: bun run build
+
+      - name: Test CLI help
+        working-directory: plugins/code-review-tools
+        run: node scripts/dist/cli.js --help
+
+  report-results:
+    name: Report Test Results
+    runs-on: ubuntu-latest
+    needs: [check-trigger, test, test-cli]
+    if: always() && needs.check-trigger.outputs.should_run == 'true'
+    steps:
+      - name: Post results comment
+        uses: actions/github-script@v7
+        with: 
+          script: |
+            const testResult = '${{ needs.test.result }}';
+            const cliResult = '${{ needs.test-cli.result }}';
+            
+            let emoji = '✅';
+            let message = 'All tests passed!';
+            
+            if (testResult === 'failure' || cliResult === 'failure') {
+              emoji = '❌';
+              message = 'Some tests failed. Please check the logs.';
+            } else if (testResult === 'cancelled' || cliResult === 'cancelled') {
+              emoji = '⚠️';
+              message = 'Tests were cancelled.';
+            }
+            
+            const body = `${emoji} **Code Review Tools Test Results**
+
+            **Unit Tests:** ${testResult === 'success' ? '✅ Passed' : testResult === 'failure' ? '❌ Failed' : '⚠️ ' + testResult}
+            **CLI Tests:** ${cliResult === 'success' ? '✅ Passed' : cliResult === 'failure' ? '❌ Failed' : '⚠️ ' + cliResult}
+
+            ${message}
+
+            [View workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: body
+            });
