@@ -222,8 +222,8 @@ describe("prepareReview", () => {
       expect(result.data.rulesContent).toContain("Component Extraction")
       expect(result.data.rulesContent).toContain("Component Reuse")
       expect(result.data.rulesContent).toContain("AI Slop")
-      expect(result.data.reportTemplate).toContain("Report Template")
-      expect(result.data.summaryTemplate).toContain("Summary Template")
+      expect(result.data.reportTemplate).toContain("Code Review Report Template")
+      expect(result.data.summaryTemplate).toContain("Code Review Summary")
       expect(result.data.outputDirectory).toBe(
         ".claude/code-review-tools/reports",
       )
