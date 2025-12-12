@@ -1,0 +1,22 @@
+{
+  "name": "spec-kit",
+  "description": "Spec-Driven Development toolkit for Claude Code. Create specifications, plans, and tasks following a structured workflow from requirements to implementation.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Retso Huang",
+    "email": "retsohuang@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "spec-driven-development",
+    "specifications",
+    "planning",
+    "requirements",
+    "workflow",
+    "development"
+  ],
+  "category": "development",
+  "commands": [
+    "commands"
+  ]
+}
