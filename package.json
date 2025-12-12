@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "devDependencies": {
+    "lefthook": "^1.11.5"
+  },
+  "scripts": {
+    "prepare": "lefthook install"
+  }
+}
+
