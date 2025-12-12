@@ -6,11 +6,11 @@ pre-commit:
       root: 'plugins/code-review-tools/scripts/'
       glob: '**/*.{ts,js}'
       exclude: "(dist|node_modules|\\.claude)/.*"
-      run: bunx oxlint {staged_files}
+      run: bun run lint {staged_files}
 
     # TypeScript/JavaScript - Formatting
     js-format:
       root: 'plugins/code-review-tools/scripts/'
       glob: '**/*.{ts,js,json}'
       exclude: "(dist|node_modules|\\.claude)/.*"
-      run: bunx prettier --write {staged_files}
+      run: bun run format {staged_files}
