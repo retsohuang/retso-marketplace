@@ -1,0 +1,14 @@
+{
+  "name": "github-tools",
+  "version": "0.1.0",
+  "description": "GitHub workflow tools for daily development",
+  "author": {
+    "name": "Retso Huang",
+    "email": "retsohuang@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["github", "pr", "code-review", "workflow"],
+  "category": "development",
+  "commands": ["commands"],
+  "agents": ["agents"]
+}
