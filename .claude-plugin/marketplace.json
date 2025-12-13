@@ -26,6 +26,24 @@
         "custom-rules"
       ],
       "category": "development"
+    },
+    {
+      "name": "github-tools",
+      "description": "GitHub workflow tools for daily development. Analyze PR review comments and categorize what needs fixing.",
+      "version": "0.1.0",
+      "source": "./plugins/github-tools",
+      "author": {
+        "name": "Retso Huang",
+        "email": "retsohuang@gmail.com"
+      },
+      "license": "MIT",
+      "keywords": [
+        "github",
+        "pr",
+        "code-review",
+        "workflow"
+      ],
+      "category": "development"
     }
   ]
 }

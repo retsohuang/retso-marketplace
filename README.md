@@ -135,7 +135,8 @@ The marketplace is configured in `.claude-plugin/marketplace.json`. Key fields:
 
 | Plugin Name | Description | Version |
 |-------------|-------------|---------|
-| [code-review](./plugins/code-review/README.md) | Review code changes commit-by-commit with custom rules support. Includes interactive setup and rule creation. | 2.1.0 |
+| [code-review-tools](./plugins/code-review-tools/README.md) | Review code changes commit-by-commit with custom rules support. Includes interactive setup and rule creation. | 2.1.0 |
+| [github-tools](./plugins/github-tools/README.md) | GitHub workflow tools for daily development. Analyze PR review comments and categorize what needs fixing. | 0.1.0 |
 
 ## Contributing
 
