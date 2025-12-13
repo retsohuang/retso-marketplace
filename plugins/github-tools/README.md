@@ -8,12 +8,57 @@ This plugin provides commands and agents to streamline GitHub-based development 
 
 ## Features
 
+- **Quick PR Creation**: Create pull requests with auto-generated titles and descriptions
+- **Duplicate Detection**: Automatically checks if a PR already exists before creating
 - **Automated PR Comment Analysis**: Analyze review comments and get intelligent recommendations
 - **Parallel Processing**: Leverage multiple agents for fast analysis of many comments
 - **Smart Categorization**: Automatically categorize feedback as Must Fix / Consider / Can Skip
 - **Research-Backed**: Agents can search for best practices to validate technical claims
 
 ## Commands
+
+### `/github-tools:create-pull-request`
+
+Creates a pull request for your current branch, or shows existing PR info if one already exists.
+
+**Usage**:
+```bash
+/github-tools:create-pull-request
+```
+
+**What it does**:
+1. Checks if a PR already exists for the current branch
+2. If exists: displays PR number, URL, title, and state
+3. If not exists: auto-generates title and body from commits
+4. Creates the PR against the default branch (main/master)
+
+**Output example** (new PR):
+```markdown
+## Pull Request Created
+
+**PR #42**: feat: add user authentication
+**URL**: https://github.com/user/repo/pull/42
+
+The pull request has been created successfully.
+```
+
+**Output example** (existing PR):
+```markdown
+## Existing Pull Request Found
+
+**PR #42**: feat: add user authentication
+**URL**: https://github.com/user/repo/pull/42
+**State**: open
+
+A pull request already exists for this branch.
+```
+
+**Requirements**:
+- GitHub CLI (`gh`) installed and authenticated
+- Current branch must have commits ahead of the default branch
+- Must not be on the default branch (main/master)
+
+---
 
 ### `/github-tools:fix-pr-comment`
 
