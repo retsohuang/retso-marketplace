@@ -135,7 +135,7 @@ Output the analysis in a formatted markdown table:
 
 - **Truncate comments**: Show first 60 chars in table, full text in reason if needed
 - **File paths**: Show relative path with line number
-- **Sortorder**: Must Fix → Consider → Can Skip
+- **Sort order**: Must Fix → Consider → Can Skip
 - **Numbering**: Sequential from 1
 - **Research**: Only include if agents performed WebSearch
 
