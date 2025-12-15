@@ -2,7 +2,7 @@
 description: Review code changes commit-by-commit like a human reviewer
 argument-hint: <commit-hash>
 allowed-tools: Bash
-model: claude-haiku-4-5
+model: claude-sonnet-4-5
 ---
 
 # Code Review
@@ -69,11 +69,13 @@ Invoke the `report-writer` agent with the prepared JSON data directly. The CLI o
 ```
 
 **Agent invocation:**
+
 - Agent name: `report-writer`
 - Input: Pass `$REVIEW_DATA` directly as JSON
 - Output: Terminal summary (report file is written by the agent)
 
 The agent will handle:
+
 - Parsing the JSON input to extract commits, rules, templates, and config
 - Spawning commit-reviewer agents for each commit
 - Aggregating and deduplicating results
@@ -82,18 +84,37 @@ The agent will handle:
 
 ### Step 3: Display Results
 
-Simply display the output returned by the report-writer agent. The agent will have already:
-- Written the full report to disk
-- Included the file path in the terminal summary
+**CRITICAL**: Display the report-writer agent's output EXACTLY as returned, without modification.
+
+The agent returns a properly formatted markdown summary with:
+
+- A summary table (Commits | Files | Issues)
+- Review process details
+- Top issues list
+- Key recommendations
+- File path to full report
+
+**Do NOT**:
+
+- Rewrite the summary in your own words
+- Convert the table to prose
+- Add conversational preambles like "The review found..."
+- Summarize or paraphrase the agent's output
+
+**Do**:
+
+- Output the agent's response verbatim
+- Prefix with `=== Code Review Complete ===` header only
 
 ```bash
 echo "=== Code Review Complete ==="
 echo ""
-# Display whatever the report-writer returned (terminal summary)
+# Output the agent's response EXACTLY as returned (do not rewrite)
 echo "$AGENT_OUTPUT"
 ```
 
 **Output Behavior:**
-- Terminal displays: Brief summary with file path
+
+- Terminal displays: Agent's formatted summary with table (verbatim)
 - File contains: Complete detailed report with all issues and code snippets
 - All orchestration happens inside the report-writer agent
