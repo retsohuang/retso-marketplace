@@ -135,22 +135,36 @@ Main Orchestrator
 - **Performant**: Batched processing respects `maxConcurrentAgents` limit (default: 0 unlimited)
 - **Consistent formatting**: Report generation uses Sonnet model for reliable formatting consistency
 
-**Sub-agents:**
-- `commit-reviewer` (Sonnet model): Analyzes one commit against all enabled rules, returns JSON
-- `report-writer` (Sonnet model): Orchestrates commit-reviewers, aggregates results, writes final report
+**Models:**
+- `review` command (Sonnet model): Orchestrates the review process and displays report-writer output
+- `commit-reviewer` agent (Sonnet model): Analyzes one commit against all enabled rules, returns JSON
+- `report-writer` agent (Sonnet model): Orchestrates commit-reviewers, aggregates results, writes final report
 
 ## Model Configuration
 
-The report-writer agent uses **Claude Sonnet 4.5** for reliable formatting consistency. This ensures generated reports consistently match the template format.
+Both the **review command** and **report-writer agent** use **Claude Sonnet 4.5** for reliable output handling and formatting consistency.
+
+### Why Sonnet for the Review Command?
+
+The review command (orchestrator) uses Sonnet instead of Haiku because:
+- **Haiku ignores agent output**: Testing revealed that `claude-haiku-4-5` consistently ignores the formatted output returned by the `report-writer` agent
+- **Sonnet preserves output**: `claude-sonnet-4-5` reliably displays the agent's formatted summary without modification
+- **Simple orchestration**: While the review command performs simple orchestration tasks, it must faithfully relay the report-writer's output to the user
+
+### Why Sonnet for Report-Writer?
+
+The report-writer agent uses Sonnet for:
+- **Formatting consistency**: Ensures generated reports consistently match the template format
+- **Reliable aggregation**: Properly aggregates results from multiple commit-reviewer agents
 
 ### Cost Considerations
 
-- **Report-writer cost**: ~$0.03-0.10 per review (vs. ~$0.003-0.01 with Haiku)
-- **Trade-off**: ~10x cost increase for consistently formatted, production-quality reports
+- **Total cost per review**: ~$0.04-0.12 (review command + report-writer, vs. ~$0.003-0.01 with Haiku)
+- **Trade-off**: ~10-12x cost increase for reliably displayed, production-quality reports
 - **Acceptable for**: Most use cases with <100 reviews/day
 - **Monitor costs**: For high-frequency usage (100+ reviews/day), track API billing
 
-The quality improvement is worth the cost increase for a production-quality code review tool - consistently formatted reports eliminate manual formatting corrections
+The cost increase is justified to ensure the tool works correctly - Haiku's output-ignoring behavior makes it unsuitable for this orchestration task despite being designed for such use cases
 
 ## Review Philosophy
 
@@ -501,7 +515,7 @@ plugins/code-review/
 ├── config-schema.json       # Configuration schema
 ├── agents/
 │   ├── commit-reviewer.md  # Sub-agent: reviews one commit with all rules
-│   └── report-writer.md # Sub-agent: orchestrates review, writes report (Sonnet)
+│   └── report-writer.md    # Sub-agent: orchestrates review, writes report (Sonnet)
 ├── commands/
 │   ├── review.md           # Main review command
 │   ├── init.md             # Setup command

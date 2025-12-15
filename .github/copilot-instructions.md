@@ -61,7 +61,7 @@ Custom rules live in `.claude/code-review-rules/` directory. Validate schema aga
 1. **File naming**: Commands use kebab-case (`create-rule.md`), rules append `-rules.md`
 2. **Error handling**: Commands must provide fallback behavior when config is missing/invalid
 3. **Backward compatibility**: Missing config = all built-in rules enabled (no breaking changes)
-4. **Model selection**: Use `inherit` for heavy analysis, `haiku` for fast aggregation tasks
+4. **Model selection**: Use `inherit` for heavy analysis, `sonnet` for orchestration when agent output must be preserved (Haiku can ignore agent output)
 
 ## Adding New Plugins
 
@@ -73,9 +73,9 @@ Custom rules live in `.claude/code-review-rules/` directory. Validate schema aga
 ## Review Command Data Flow
 
 ```
-review.md → loads config → spawns commit-reviewer agents (parallel, batched)
-         → collects JSON results → spawns report-aggregator (haiku)
-         → outputs final markdown report
+review.md (sonnet) → loads config → spawns commit-reviewer agents (parallel, batched)
+                   → collects JSON results → spawns report-writer (sonnet)
+                   → outputs formatted markdown summary verbatim
 ```
 
 Sub-agents return structured JSON, not markdown. The aggregator transforms JSON to formatted output.
