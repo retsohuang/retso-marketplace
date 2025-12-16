@@ -1,6 +1,6 @@
 {
   "name": "github-tools",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "GitHub workflow tools for daily development",
   "author": {
     "name": "Retso Huang",
@@ -8,7 +8,11 @@
   },
   "license": "MIT",
   "keywords": ["github", "pr", "code-review", "workflow"],
-  "category": "development",
-  "commands": ["commands"],
-  "agents": ["agents"]
+  "commands": [
+    "./commands/create-pull-request.md",
+    "./commands/fix-pr-comment.md"
+  ],
+  "agents": [
+    "./agents/comment-reviewer.md"
+  ]
 }
