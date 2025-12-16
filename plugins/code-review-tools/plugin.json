@@ -1,7 +1,7 @@
 {
   "name": "code-review-tools",
   "description": "Review code changes commit-by-commit with custom rules support. Includes interactive setup and rule creation.",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "author": {
     "name": "Retso Huang",
     "email": "retsohuang@gmail.com"
@@ -14,11 +14,13 @@
     "components",
     "custom-rules"
   ],
-  "category": "development",
   "commands": [
-    "commands"
+    "./commands/create-rule.md",
+    "./commands/init.md",
+    "./commands/review.md"
   ],
   "agents": [
-    "agents"
+    "./agents/commit-reviewer.md",
+    "./agents/report-writer.md"
   ]
 }
