@@ -15,7 +15,6 @@
     "workflow",
     "development"
   ],
-  "category": "development",
   "commands": [
     "./commands/analyze.md",
     "./commands/clarify.md",
