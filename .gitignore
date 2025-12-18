@@ -31,3 +31,4 @@ yarn-error.log*
 # Build outputs
 build/
 *.log
+.mcp.json
