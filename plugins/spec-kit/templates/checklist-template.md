@@ -1,259 +1,194 @@
-# Quality Checklist: {Feature Name}
+# Quality Checklist: [FEATURE NAME]
 
-**Feature**: {Feature Name}
-**Date**: YYYY-MM-DD
-**Reviewed By**: {Name}
+**Feature**: [Feature Name]
+**Date**: [DATE]
+**Reviewed By**: [Name]
 
-## Requirements Validation
+---
 
-### Specification Review
-- [ ] All user stories have acceptance criteria
-- [ ] Functional requirements are testable
-- [ ] Non-functional requirements have metrics
-- [ ] Technical requirements are feasible
+## Specification Quality
+
+*Like "unit tests for English" - validate requirements before implementation*
+
+### Completeness
+
+- [ ] All user stories have acceptance scenarios (Given/When/Then)
+- [ ] No [NEEDS CLARIFICATION] markers remain unresolved
+- [ ] Edge cases are identified and documented
+- [ ] Error scenarios are specified
 - [ ] Success criteria are measurable
-- [ ] Out of scope items are clearly defined
 
-### Constitution Alignment
-- [ ] Feature aligns with project vision
-- [ ] Implementation follows technical standards
-- [ ] Design decisions respect core principles
-- [ ] Trade-offs are documented and justified
+### Clarity
+
+- [ ] Requirements are testable and unambiguous
+- [ ] User types and permissions are clearly defined
+- [ ] Data retention/deletion policies are specified
+- [ ] Performance targets are quantified
+- [ ] Scope boundaries are explicit
+
+### Consistency
+
+- [ ] No contradictions between requirements
+- [ ] User stories align with functional requirements
+- [ ] Non-functional requirements don't conflict
+- [ ] Terminology is consistent throughout
+
+### No Implementation Details
+
+- [ ] No programming languages mentioned
+- [ ] No frameworks or libraries specified
+- [ ] No API structure defined
+- [ ] No database schema included
+- [ ] Written for business stakeholders
+
+---
+
+## Plan Quality
+
+### Technical Context
+
+- [ ] All NEEDS CLARIFICATION markers resolved
+- [ ] Technology choices have rationale in research.md
+- [ ] Alternatives were considered and documented
+- [ ] Project type correctly identified (single/web/mobile)
+
+### Constitution Compliance
+
+- [ ] Initial Constitution Check: PASS
+- [ ] Post-Design Constitution Check: PASS
+- [ ] Complexity deviations documented and justified
+- [ ] Simplicity principle followed (max 3 projects)
+
+### Design Artifacts
+
+- [ ] research.md complete with decisions and rationale
+- [ ] data-model.md has all entities from spec
+- [ ] contracts/ has schemas for all user actions
+- [ ] quickstart.md provides validation steps
+
+### Testing Strategy
+
+- [ ] TDD order enforced (tests before implementation)
+- [ ] Contract tests defined for each endpoint
+- [ ] Integration tests mapped to user stories
+- [ ] Real dependencies used (no excessive mocking)
+
+---
+
+## Task Quality
+
+### Organization
+
+- [ ] Tasks grouped by user story
+- [ ] Each story independently testable
+- [ ] Foundational phase blocks all stories (correct dependency)
+- [ ] Parallel tasks marked with [P]
+- [ ] Story labels [US1], [US2] applied consistently
+
+### Completeness
+
+- [ ] Every spec requirement maps to a task
+- [ ] Test tasks precede implementation tasks
+- [ ] File paths are explicit
+- [ ] Checkpoints defined for validation
+
+### Dependencies
+
+- [ ] No circular dependencies
+- [ ] Dependency order correct (models → services → endpoints)
+- [ ] Cross-story dependencies minimize coupling
+- [ ] MVP deliverable after User Story 1
+
+---
 
 ## Implementation Quality
 
 ### Code Quality
-- [ ] Code follows project style guide
-- [ ] Variable and function names are descriptive
+
+- [ ] Follows project constitution principles
+- [ ] No implementation before failing test
+- [ ] Single responsibility per module
+- [ ] Clear error messages with context
+
+### Testing
+
+- [ ] Tests fail before implementation (RED phase)
+- [ ] Tests pass after implementation (GREEN phase)
+- [ ] Contract tests validate schemas
+- [ ] Integration tests cover user journeys
+- [ ] Quickstart.md executes successfully
+
+### Documentation
+
+- [ ] Code is self-documenting
 - [ ] Complex logic has explanatory comments
-- [ ] No commented-out code or TODOs left
-- [ ] No console.log or debugging statements
-- [ ] Error messages are user-friendly
-- [ ] Code is DRY (no unnecessary duplication)
+- [ ] API contracts match implementation
+- [ ] README updated if needed
 
-### Architecture
-- [ ] Component boundaries are well-defined
-- [ ] Dependencies are minimal and justified
-- [ ] Abstractions are appropriate (not over-engineered)
-- [ ] File organization follows project conventions
-- [ ] Separation of concerns is maintained
+---
 
-### Performance
-- [ ] No obvious performance bottlenecks
-- [ ] Large lists are virtualized if needed
-- [ ] Images are optimized and lazy-loaded
-- [ ] Bundle size impact is acceptable
-- [ ] Database queries are optimized
-- [ ] API calls are batched where appropriate
-- [ ] Unnecessary re-renders are avoided
+## Cross-Artifact Consistency
 
-## Testing
+*Run after /tasks, before /implement*
 
-### Unit Tests
-- [ ] All services have unit tests
-- [ ] All utilities have unit tests
-- [ ] All hooks have unit tests
-- [ ] Components have rendering tests
-- [ ] Edge cases are covered
-- [ ] Error scenarios are tested
-- [ ] Test coverage is ≥ 80%
+### Spec ↔ Plan Alignment
 
-### Integration Tests
-- [ ] API integrations are tested
-- [ ] Database operations are tested
-- [ ] State management is tested
-- [ ] External service integrations are tested
+- [ ] Every spec requirement addressed in plan
+- [ ] Data model covers all spec entities
+- [ ] API contracts handle all user actions
+- [ ] No plan features not in spec (scope creep)
 
-### E2E Tests
-- [ ] Happy path user flows are tested
-- [ ] Error scenarios are tested
-- [ ] Edge cases are tested
-- [ ] Cross-browser compatibility verified
+### Plan ↔ Tasks Alignment
 
-### Manual Testing
-- [ ] Feature works as specified
-- [ ] UI is responsive across screen sizes
-- [ ] Keyboard navigation works
-- [ ] Focus management is correct
-- [ ] Loading states are appropriate
-- [ ] Error states are user-friendly
-- [ ] Success feedback is clear
+- [ ] Every plan component has tasks
+- [ ] Task dependencies match plan phases
+- [ ] File paths consistent with plan structure
+- [ ] Estimated task count reasonable (25-30 typical)
 
-## Security
+### Tasks ↔ Implementation Alignment
 
-### Authentication & Authorization
-- [ ] Authentication is required where needed
-- [ ] Authorization checks are in place
-- [ ] User permissions are respected
-- [ ] Sessions are handled securely
+- [ ] All tasks completed or explicitly deferred
+- [ ] No uncommitted code changes
+- [ ] Tests passing for completed stories
+- [ ] Checkpoints validated
 
-### Data Protection
-- [ ] Sensitive data is encrypted
-- [ ] PII is handled according to regulations
-- [ ] API keys are not exposed
-- [ ] Secrets are not committed to git
+---
 
-### Input Validation
-- [ ] All user input is validated
-- [ ] SQL injection is prevented
-- [ ] XSS vulnerabilities are prevented
-- [ ] CSRF protection is in place
+## Final Validation
 
-### Security Best Practices
-- [ ] Dependencies are up to date
-- [ ] Known vulnerabilities are addressed
-- [ ] Security headers are configured
-- [ ] Rate limiting is implemented where needed
+### Functional
 
-## Accessibility (a11y)
+- [ ] All acceptance scenarios pass
+- [ ] Edge cases handled correctly
+- [ ] Error scenarios return appropriate feedback
+- [ ] User flows work end-to-end
 
-### WCAG 2.1 Level AA
-- [ ] Color contrast meets 4.5:1 ratio
-- [ ] All interactive elements are keyboard accessible
-- [ ] Focus indicators are visible
-- [ ] Screen reader compatible
-- [ ] ARIA labels are used appropriately
-- [ ] Semantic HTML is used
-- [ ] Form inputs have associated labels
-- [ ] Error messages are accessible
+### Non-Functional
 
-### Additional Accessibility
-- [ ] Images have alt text
-- [ ] Videos have captions
-- [ ] Skip links are provided
-- [ ] Text can be resized to 200%
-- [ ] Motion can be disabled
+- [ ] Performance targets met
+- [ ] Security requirements satisfied
+- [ ] Accessibility standards followed
+- [ ] Scalability assumptions validated
 
-## User Experience
+### Documentation
 
-### Design Consistency
-- [ ] Matches design system
-- [ ] Visual hierarchy is clear
-- [ ] Spacing is consistent
-- [ ] Typography is consistent
-- [ ] Icons are appropriate
-
-### Usability
-- [ ] User flows are intuitive
-- [ ] Error messages are helpful
-- [ ] Success feedback is clear
-- [ ] Loading states are informative
-- [ ] Empty states are handled
-- [ ] Feature is discoverable
-
-### Mobile Experience
-- [ ] Touch targets are ≥ 44x44px
-- [ ] Gestures work as expected
-- [ ] Text is readable without zooming
-- [ ] Forms are easy to fill
-- [ ] Navigation is mobile-friendly
-
-## Documentation
-
-### Code Documentation
-- [ ] Complex functions have JSDoc
-- [ ] Type definitions are complete
-- [ ] README is updated
-- [ ] API contracts are documented
-
-### User Documentation
-- [ ] User guide is written
-- [ ] Help text is provided in UI
-- [ ] Onboarding is smooth
-- [ ] FAQs address common questions
-
-### Developer Documentation
-- [ ] Architecture is documented
-- [ ] Setup instructions are clear
-- [ ] Contributing guide is updated
-- [ ] Changelog is updated
-
-## Deployment
-
-### Pre-Deployment
-- [ ] Feature flag is configured
-- [ ] Database migrations are tested
-- [ ] Rollback plan is documented
-- [ ] Monitoring is configured
-- [ ] Alerts are set up
-
-### Deployment Verification
-- [ ] Deployed to staging successfully
-- [ ] Smoke tests passed on staging
-- [ ] Performance metrics are acceptable
-- [ ] Error rates are normal
-- [ ] Logs show no unexpected errors
-
-### Post-Deployment
-- [ ] Feature is working in production
-- [ ] Monitoring shows healthy metrics
-- [ ] No unexpected errors in logs
-- [ ] User feedback is being collected
-- [ ] Success metrics are being tracked
-
-## Performance Metrics
-
-### Load Time
-- [ ] First contentful paint < 1.8s
-- [ ] Time to interactive < 3.8s
-- [ ] Total page load < 5s
-
-### Runtime Performance
-- [ ] No jank or frame drops
-- [ ] Interactions feel instant
-- [ ] Animations are smooth (60fps)
-
-### Resource Usage
-- [ ] Bundle size increase is acceptable
-- [ ] Memory usage is reasonable
-- [ ] CPU usage is efficient
-- [ ] Network requests are optimized
-
-## Browser Compatibility
-
-- [ ] Chrome (latest)
-- [ ] Firefox (latest)
-- [ ] Safari (latest)
-- [ ] Edge (latest)
-- [ ] Mobile Safari (iOS)
-- [ ] Chrome Mobile (Android)
-
-## Final Checks
-
-### Code Review
-- [ ] Code review completed
-- [ ] All feedback addressed
-- [ ] Approved by tech lead
-- [ ] No merge conflicts
-
-### Project Management
-- [ ] Spec is marked complete
-- [ ] Plan is updated
-- [ ] Tasks are closed
-- [ ] Jira/GitHub issues are updated
-
-### Communication
-- [ ] Team notified of deployment
-- [ ] Stakeholders informed
-- [ ] Documentation shared
-- [ ] Demo scheduled if needed
+- [ ] Spec marked complete
+- [ ] Plan updated with final status
+- [ ] Tasks closed out
+- [ ] Any deviations documented
 
 ---
 
 ## Sign-off
 
-### Reviewers
-
-**Developer**: ___________________ Date: _______
-
-**Tech Lead**: ___________________ Date: _______
-
-**Product**: ___________________ Date: _______
-
-**QA**: ___________________ Date: _______
+| Role | Name | Date | Status |
+|------|------|------|--------|
+| Developer | | | |
+| Reviewer | | | |
+| Product | | | |
 
 ---
 
 ## Notes
 
-<!-- Any additional notes, concerns, or items to address post-launch -->
+<!-- Any observations, lessons learned, or items for follow-up -->

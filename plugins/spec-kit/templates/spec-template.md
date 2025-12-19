@@ -1,231 +1,139 @@
-# Specification: {Feature Name}
+# Feature Specification: [FEATURE NAME]
 
+**Feature Branch**: `spec-kit/[###-feature-name]`
+**Created**: [DATE]
 **Status**: Draft
-**Author**: {Your Name}
-**Created**: YYYY-MM-DD
-**Last Updated**: YYYY-MM-DD
+**Input**: User description: "$ARGUMENTS"
 
-## Overview
+## Execution Flow (main)
 
-<!-- A concise summary of what this feature is and why we're building it -->
-
-### Problem Statement
-<!-- What problem are we solving? What pain point does this address? -->
-
-### Proposed Solution
-<!-- High-level description of how we'll solve the problem -->
-
-### Goals
-<!-- What do we want to achieve with this feature? -->
-
--
--
--
-
-### Non-Goals
-<!-- What is explicitly out of scope for this feature? -->
-
--
--
--
-
-## User Stories
-
-<!-- User stories in the format: "As a [user type], I want [goal] so that [benefit]" -->
-
-### Primary Users
-
-#### Story 1
-**As a** [user type]
-**I want** [goal]
-**So that** [benefit]
-
-**Acceptance Criteria:**
-- [ ] Criterion 1
-- [ ] Criterion 2
-- [ ] Criterion 3
-
-#### Story 2
-**As a** [user type]
-**I want** [goal]
-**So that** [benefit]
-
-**Acceptance Criteria:**
-- [ ] Criterion 1
-- [ ] Criterion 2
-- [ ] Criterion 3
-
-### Secondary Users
-
-<!-- Additional user stories for secondary personas -->
-
-## Requirements
-
-### Functional Requirements
-
-<!-- What the system must do -->
-
-1. **FR-1**: {Requirement name}
-   - Description: {Details}
-   - Priority: High | Medium | Low
-   - Dependencies: {Other requirements or systems}
-
-2. **FR-2**: {Requirement name}
-   - Description: {Details}
-   - Priority: High | Medium | Low
-   - Dependencies: {Other requirements or systems}
-
-### Non-Functional Requirements
-
-<!-- How the system should perform -->
-
-1. **NFR-1**: {Requirement name}
-   - Description: {Details}
-   - Metric: {How to measure success}
-   - Target: {Specific threshold or value}
-
-2. **NFR-2**: {Requirement name}
-   - Description: {Details}
-   - Metric: {How to measure success}
-   - Target: {Specific threshold or value}
-
-### Technical Requirements
-
-<!-- Technical constraints and dependencies -->
-
-1. **TR-1**: {Requirement name}
-   - Description: {Details}
-   - Rationale: {Why this is required}
-
-2. **TR-2**: {Requirement name}
-   - Description: {Details}
-   - Rationale: {Why this is required}
-
-## User Interface
-
-<!-- Mockups, wireframes, or detailed UI descriptions -->
-
-### Key Screens/Views
-
-#### View 1: {Name}
-<!-- Description, mockup, or wireframe -->
-
-#### View 2: {Name}
-<!-- Description, mockup, or wireframe -->
-
-### User Flows
-
-<!-- Step-by-step flows through the feature -->
-
-1. **Flow 1**: {Name}
-   - Step 1: {Action}
-   - Step 2: {Action}
-   - Step 3: {Action}
-
-## Data Requirements
-
-### Data Models
-
-<!-- Key data structures this feature will use or create -->
-
-#### Model 1: {Name}
 ```
-{
-  field1: type,
-  field2: type,
-  field3: type
-}
+1. Parse user description from Input
+   → If empty: ERROR "No feature description provided"
+2. Extract key concepts from description
+   → Identify: actors, actions, data, constraints
+3. For each unclear aspect:
+   → Mark with [NEEDS CLARIFICATION: specific question]
+4. Fill User Scenarios & Testing section
+   → If no clear user flow: ERROR "Cannot determine user scenarios"
+5. Generate Functional Requirements
+   → Each requirement must be testable
+   → Mark ambiguous requirements
+6. Identify Key Entities (if data involved)
+7. Run Review Checklist
+   → If any [NEEDS CLARIFICATION]: WARN "Spec has uncertainties"
+   → If implementation details found: ERROR "Remove tech details"
+8. Return: SUCCESS (spec ready for planning)
 ```
-
-### Data Sources
-<!-- Where data comes from -->
-
--
--
-
-### Data Persistence
-<!-- How and where data is stored -->
-
--
--
-
-## Integration Points
-
-### External Services
-<!-- Third-party APIs or services -->
-
--
--
-
-### Internal Systems
-<!-- Other systems within the codebase -->
-
--
--
-
-## Security Considerations
-
-<!-- Authentication, authorization, data protection, and security concerns -->
-
--
--
--
-
-## Success Metrics
-
-<!-- How we'll measure if this feature is successful -->
-
-1. **Metric 1**: {Name}
-   - Definition: {How to measure}
-   - Target: {Goal value}
-   - Timeline: {When to measure}
-
-2. **Metric 2**: {Name}
-   - Definition: {How to measure}
-   - Target: {Goal value}
-   - Timeline: {When to measure}
-
-## Risks and Mitigation
-
-| Risk | Impact | Probability | Mitigation Strategy |
-|------|--------|-------------|---------------------|
-|      |        |             |                     |
-|      |        |             |                     |
-
-## Open Questions
-
-<!-- Unresolved questions that need answers before or during implementation -->
-
-1. {Question 1}
-2. {Question 2}
-3. {Question 3}
-
-## Assumptions
-
-<!-- What we're assuming to be true -->
-
--
--
--
-
-## Out of Scope
-
-<!-- Features, functionality, or approaches explicitly not included -->
-
--
--
--
-
-## References
-
-<!-- Links to related docs, design files, research, etc. -->
-
--
--
--
 
 ---
 
-**Next Steps:**
-1. Review and clarify open questions → Run `/spec-kit:clarify`
-2. Create implementation plan → Run `/spec-kit:plan`
+## Quick Guidelines
+
+- ✅ Focus on WHAT users need and WHY
+- ❌ Avoid HOW to implement (no tech stack, APIs, code structure)
+- 👥 Written for business stakeholders, not developers
+
+### Section Requirements
+
+- **Mandatory sections**: Must be completed for every feature
+- **Optional sections**: Include only when relevant to the feature
+- When a section doesn't apply, remove it entirely (don't leave as "N/A")
+
+### For AI Generation
+
+When creating this spec from a user prompt:
+
+1. **Mark all ambiguities**: Use [NEEDS CLARIFICATION: specific question] for any assumption you'd need to make
+2. **Don't guess**: If the prompt doesn't specify something (e.g., "login system" without auth method), mark it
+3. **Think like a tester**: Every vague requirement should fail the "testable and unambiguous" checklist item
+4. **Common underspecified areas**:
+   - User types and permissions
+   - Data retention/deletion policies
+   - Performance targets and scale
+   - Error handling behaviors
+   - Integration requirements
+   - Security/compliance needs
+
+---
+
+## User Scenarios & Testing *(mandatory)*
+
+### Primary User Story
+
+[Describe the main user journey in plain language]
+
+### Acceptance Scenarios
+
+1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+2. **Given** [initial state], **When** [action], **Then** [expected outcome]
+3. **Given** [initial state], **When** [action], **Then** [expected outcome]
+
+### Edge Cases
+
+- What happens when [boundary condition]?
+- How does system handle [error scenario]?
+
+---
+
+## Requirements *(mandatory)*
+
+### Functional Requirements
+
+- **FR-001**: System MUST [specific capability]
+- **FR-002**: System MUST [specific capability]
+- **FR-003**: Users MUST be able to [key interaction]
+- **FR-004**: System MUST [data requirement]
+- **FR-005**: System MUST [behavior]
+
+*Example of marking unclear requirements:*
+
+- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
+- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+
+### Non-Functional Requirements *(optional)*
+
+- **NFR-001**: System SHOULD respond within [NEEDS CLARIFICATION: target latency not specified]
+- **NFR-002**: System SHOULD support [NEEDS CLARIFICATION: expected scale not specified] concurrent users
+
+### Key Entities *(include if feature involves data)*
+
+- **[Entity 1]**: [What it represents, key attributes without implementation]
+- **[Entity 2]**: [What it represents, relationships to other entities]
+
+---
+
+## Review & Acceptance Checklist
+
+*GATE: Automated checks run during main() execution*
+
+### Content Quality
+
+- [ ] No implementation details (languages, frameworks, APIs)
+- [ ] Focused on user value and business needs
+- [ ] Written for non-technical stakeholders
+- [ ] All mandatory sections completed
+
+### Requirement Completeness
+
+- [ ] No [NEEDS CLARIFICATION] markers remain
+- [ ] Requirements are testable and unambiguous
+- [ ] Success criteria are measurable
+- [ ] Scope is clearly bounded
+- [ ] Dependencies and assumptions identified
+
+---
+
+## Execution Status
+
+*Updated by main() during processing*
+
+- [ ] User description parsed
+- [ ] Key concepts extracted
+- [ ] Ambiguities marked
+- [ ] User scenarios defined
+- [ ] Requirements generated
+- [ ] Entities identified
+- [ ] Review checklist passed
+
+---

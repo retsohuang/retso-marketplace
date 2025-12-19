@@ -1,110 +1,39 @@
-# Project Constitution
-
-## Project Vision
-
-<!-- A clear, inspiring statement of what this project aims to achieve and why it matters -->
+# [PROJECT_NAME] Constitution
 
 ## Core Principles
 
-### Technical Excellence
-<!-- Principles around code quality, testing, documentation, and technical decision-making -->
+### [PRINCIPLE_1_NAME]
 
--
--
--
+[PRINCIPLE_1_DESCRIPTION]
 
-### User Experience
-<!-- Principles around user-centered design, accessibility, performance, and usability -->
+### [PRINCIPLE_2_NAME]
 
--
--
--
+[PRINCIPLE_2_DESCRIPTION]
 
-### Team Collaboration
-<!-- Principles around communication, code review, knowledge sharing, and team dynamics -->
+### [PRINCIPLE_3_NAME]
 
--
--
--
+[PRINCIPLE_3_DESCRIPTION]
 
-### Velocity and Iteration
-<!-- Principles around shipping speed, MVP scope, technical debt management, and iteration cycles -->
+### [PRINCIPLE_4_NAME]
 
--
--
--
+[PRINCIPLE_4_DESCRIPTION]
+
+### [PRINCIPLE_5_NAME]
+
+[PRINCIPLE_5_DESCRIPTION]
 
 ## Technical Standards
 
-### Architecture
-<!-- Architectural patterns, design principles, and system boundaries to follow -->
+[TECHNICAL_STANDARDS_CONTENT]
 
--
--
--
+## Quality Guidelines
 
-### Code Style
-<!-- Coding conventions, naming patterns, and style guide references -->
+[QUALITY_GUIDELINES_CONTENT]
 
--
--
--
+## Governance
 
-### Testing Strategy
-<!-- Testing philosophy, coverage expectations, and testing pyramid -->
-
--
--
--
-
-### Documentation
-<!-- Documentation standards for code, APIs, and user guides -->
-
--
--
--
-
-## Decision-Making Guidelines
-
-### When to Write a Spec
-<!-- Criteria for when a feature requires a full specification -->
-
--
--
--
-
-### When to Skip the Spec
-<!-- When it's acceptable to implement directly without a spec -->
-
--
--
--
-
-### Trade-off Framework
-<!-- How to evaluate trade-offs between competing priorities -->
-
--
--
--
-
-## Success Criteria
-
-<!-- How we measure whether we're living up to these principles -->
-
--
--
--
-
-## Evolution
-
-<!-- How and when this constitution should be updated -->
-
-This constitution is a living document. It should be updated when:
--
--
--
+[GOVERNANCE_RULES]
 
 ---
 
-**Last Updated**: YYYY-MM-DD
-**Version**: 1.0
+**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]

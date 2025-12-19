@@ -1,477 +1,245 @@
-# Implementation Plan: {Feature Name}
+# Implementation Plan: [FEATURE]
 
-**Spec Reference**: [spec.md](./spec.md)
-**Status**: Draft
-**Author**: {Your Name}
-**Created**: YYYY-MM-DD
-**Last Updated**: YYYY-MM-DD
+**Branch**: `spec-kit/[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Input**: Feature specification from `.claude/spec-kit/specs/[###-feature-name]/spec.md`
 
-## Architecture Overview
-
-<!-- High-level architectural approach for implementing this feature -->
-
-### Design Principles
-<!-- Key principles guiding this implementation -->
-
--
--
--
-
-### Architectural Decisions
-
-#### Decision 1: {Title}
-- **Context**: {Why this decision is needed}
-- **Options Considered**:
-  1. Option A: {Brief description}
-  2. Option B: {Brief description}
-- **Decision**: {Chosen option}
-- **Rationale**: {Why this option}
-- **Consequences**: {Trade-offs and implications}
-
-#### Decision 2: {Title}
-- **Context**: {Why this decision is needed}
-- **Options Considered**:
-  1. Option A: {Brief description}
-  2. Option B: {Brief description}
-- **Decision**: {Chosen option}
-- **Rationale**: {Why this option}
-- **Consequences**: {Trade-offs and implications}
-
-## File Structure
-
-<!-- New files and directories to be created -->
+## Execution Flow (/plan command scope)
 
 ```
+1. Load feature spec from Input path
+   → If not found: ERROR "No feature spec at {path}"
+2. Fill Technical Context (scan for NEEDS CLARIFICATION)
+   → Detect Project Type from context (web=frontend+backend, mobile=app+api)
+   → Set Structure Decision based on project type
+3. Evaluate Constitution Check section below
+   → If violations exist: Document in Complexity Tracking
+   → If no justification possible: ERROR "Simplify approach first"
+   → Update Progress Tracking: Initial Constitution Check
+4. Execute Phase 0 → research.md
+   → If NEEDS CLARIFICATION remain: ERROR "Resolve unknowns"
+5. Execute Phase 1 → contracts, data-model.md, quickstart.md
+6. Re-evaluate Constitution Check section
+   → If new violations: Refactor design, return to Phase 1
+   → Update Progress Tracking: Post-Design Constitution Check
+7. Plan Phase 2 → Describe task generation approach (DO NOT create tasks.md)
+8. STOP - Ready for /tasks command
+```
+
+**IMPORTANT**: The /plan command STOPS at step 7. Phases 2-4 are executed by other commands:
+- Phase 2: /tasks command creates tasks.md
+- Phase 3-4: Implementation execution (manual or via tools)
+
+## Summary
+
+[Extract from feature spec: primary requirement + technical approach from research]
+
+## Technical Context
+
+**Language/Version**: [e.g., Python 3.11, TypeScript 5.0, Rust 1.75 or NEEDS CLARIFICATION]
+**Primary Dependencies**: [e.g., FastAPI, React, Next.js or NEEDS CLARIFICATION]
+**Storage**: [if applicable, e.g., PostgreSQL, SQLite, files or N/A]
+**Testing**: [e.g., pytest, Jest, vitest or NEEDS CLARIFICATION]
+**Target Platform**: [e.g., Linux server, Browser, CLI or NEEDS CLARIFICATION]
+**Project Type**: [single/web/mobile - determines source structure]
+**Performance Goals**: [domain-specific, e.g., 1000 req/s, <100ms latency or NEEDS CLARIFICATION]
+**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory or NEEDS CLARIFICATION]
+**Scale/Scope**: [domain-specific, e.g., 10k users, 1M records or NEEDS CLARIFICATION]
+
+## Constitution Check
+
+*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+
+**Simplicity**:
+- Projects: [#] (max 3 - e.g., api, cli, tests)
+- Using framework directly? (no wrapper classes)
+- Single data model? (no DTOs unless serialization differs)
+- Avoiding patterns? (no Repository/UoW without proven need)
+
+**Architecture**:
+- EVERY feature as library? (no direct app code)
+- Libraries listed: [name + purpose for each]
+- CLI per library: [commands with --help/--version/--format]
+- Library docs: llms.txt format planned?
+
+**Testing (NON-NEGOTIABLE)**:
+- RED-GREEN-Refactor cycle enforced? (test MUST fail first)
+- Git commits show tests before implementation?
+- Order: Contract→Integration→E2E→Unit strictly followed?
+- Real dependencies used? (actual DBs, not mocks)
+- Integration tests for: new libraries, contract changes, shared schemas?
+- FORBIDDEN: Implementation before test, skipping RED phase
+
+**Observability**:
+- Structured logging included?
+- Frontend logs → backend? (unified stream)
+- Error context sufficient?
+
+**Versioning**:
+- Version number assigned? (MAJOR.MINOR.BUILD)
+- BUILD increments on every change?
+- Breaking changes handled? (parallel tests, migration plan)
+
+## Project Structure
+
+### Documentation (this feature)
+
+```
+.claude/spec-kit/specs/[###-feature-name]/
+├── spec.md           # Feature specification (/specify command output)
+├── plan.md           # This file (/plan command output)
+├── research.md       # Phase 0 output (/plan command)
+├── data-model.md     # Phase 1 output (/plan command)
+├── quickstart.md     # Phase 1 output (/plan command)
+├── contracts/        # Phase 1 output (/plan command)
+└── tasks.md          # Phase 2 output (/tasks command - NOT created by /plan)
+
+.claude/spec-kit/memory/
+└── constitution.md   # Project governance (/constitution command)
+```
+
+### Source Code (repository root)
+
+```
+# Option 1: Single project (DEFAULT)
 src/
-├── features/
-│   └── {feature-name}/
-│       ├── components/
-│       │   ├── ComponentA.tsx
-│       │   └── ComponentB.tsx
-│       ├── hooks/
-│       │   └── useFeatureName.ts
-│       ├── services/
-│       │   └── featureService.ts
-│       ├── types.ts
-│       └── index.ts
-├── api/
-│   └── endpoints/
-│       └── featureEndpoints.ts
+├── models/
+├── services/
+├── cli/
+└── lib/
+
+tests/
+├── contract/
+├── integration/
+└── unit/
+
+# Option 2: Web application (when "frontend" + "backend" detected)
+backend/
+├── src/
+│   ├── models/
+│   ├── services/
+│   └── api/
 └── tests/
-    └── {feature-name}/
-        ├── ComponentA.test.tsx
-        └── featureService.test.ts
+
+frontend/
+├── src/
+│   ├── components/
+│   ├── pages/
+│   └── services/
+└── tests/
+
+# Option 3: Mobile + API (when "iOS/Android" detected)
+api/
+└── [same as backend above]
+
+ios/ or android/
+└── [platform-specific structure]
 ```
 
-### Files to Create
-<!-- List of new files with their purpose -->
-
-| File Path | Purpose | Complexity |
-|-----------|---------|------------|
-|           |         | Low/Med/High |
-|           |         | Low/Med/High |
-
-### Files to Modify
-<!-- Existing files that need changes -->
-
-| File Path | Changes Needed | Impact |
-|-----------|----------------|---------|
-|           |                | Low/Med/High |
-|           |                | Low/Med/High |
-
-## Data Models
-
-### Model 1: {Name}
-
-**Purpose**: {What this model represents}
-
-```typescript
-interface ModelName {
-  field1: type;    // Description
-  field2: type;    // Description
-  field3: type;    // Description
-}
-```
-
-**Relationships**:
--
--
-
-### Model 2: {Name}
-
-**Purpose**: {What this model represents}
-
-```typescript
-interface ModelName {
-  field1: type;    // Description
-  field2: type;    // Description
-}
-```
-
-## API Contracts
-
-### Endpoint 1: {Name}
-
-**Method**: GET | POST | PUT | DELETE | PATCH
-**Path**: `/api/v1/resource`
-**Auth Required**: Yes | No
-
-**Request:**
-```json
-{
-  "field1": "value",
-  "field2": "value"
-}
-```
-
-**Response Success (200):**
-```json
-{
-  "data": {
-    "field1": "value",
-    "field2": "value"
-  }
-}
-```
-
-**Response Error (4xx/5xx):**
-```json
-{
-  "error": {
-    "code": "ERROR_CODE",
-    "message": "Human readable message"
-  }
-}
-```
-
-### Endpoint 2: {Name}
-
-**Method**: GET | POST | PUT | DELETE | PATCH
-**Path**: `/api/v1/resource/{id}`
-**Auth Required**: Yes | No
-
-**Request:**
-```json
-{
-  "field1": "value"
-}
-```
-
-**Response:**
-```json
-{
-  "data": {}
-}
-```
-
-## Component Hierarchy
+**Structure Decision**: [DEFAULT to Option 1 unless Technical Context indicates web/mobile app]
 
-<!-- Visual representation of component relationships -->
+## Phase 0: Outline & Research
 
-```
-App
-└── FeatureContainer
-    ├── FeatureHeader
-    │   ├── Title
-    │   └── Actions
-    ├── FeatureContent
-    │   ├── SubComponentA
-    │   └── SubComponentB
-    └── FeatureFooter
-```
+1. **Extract unknowns from Technical Context** above:
+   - For each NEEDS CLARIFICATION → research task
+   - For each dependency → best practices task
+   - For each integration → patterns task
 
-## State Management
+2. **Generate and dispatch research agents**:
+   ```
+   For each unknown in Technical Context:
+     Task: "Research {unknown} for {feature context}"
+   For each technology choice:
+     Task: "Find best practices for {tech} in {domain}"
+   ```
 
-### Global State
-<!-- State that needs to be global -->
+3. **Consolidate findings** in `research.md` using format:
+   - Decision: [what was chosen]
+   - Rationale: [why chosen]
+   - Alternatives considered: [what else evaluated]
 
-```typescript
-interface FeatureState {
-  field1: type;
-  field2: type;
-}
-```
+**Output**: research.md with all NEEDS CLARIFICATION resolved
 
-**Location**: {Context, Redux, Zustand, etc.}
-**Rationale**: {Why global}
+## Phase 1: Design & Contracts
 
-### Local State
-<!-- State that can remain local to components -->
+*Prerequisites: research.md complete*
 
--
--
+1. **Extract entities from feature spec** → `data-model.md`:
+   - Entity name, fields, relationships
+   - Validation rules from requirements
+   - State transitions if applicable
 
-## Dependencies
+2. **Generate API contracts** from functional requirements:
+   - For each user action → endpoint
+   - Use standard REST/GraphQL patterns
+   - Output OpenAPI/GraphQL schema to `/contracts/`
 
-### New Dependencies
-<!-- npm/yarn packages to add -->
+3. **Generate contract tests** from contracts:
+   - One test file per endpoint
+   - Assert request/response schemas
+   - Tests must fail (no implementation yet)
 
-| Package | Version | Purpose | Bundle Impact |
-|---------|---------|---------|---------------|
-|         |         |         |               |
+4. **Extract test scenarios** from user stories:
+   - Each story → integration test scenario
+   - Quickstart test = story validation steps
 
-### Peer Dependencies
-<!-- Required versions of existing packages -->
+**Output**: data-model.md, /contracts/*, failing tests, quickstart.md
 
-| Package | Required Version | Current Version |
-|---------|-----------------|-----------------|
-|         |                 |                 |
+## Phase 2: Task Planning Approach
 
-## Database Schema Changes
+*This section describes what the /tasks command will do - DO NOT execute during /plan*
 
-### New Tables
+**Task Generation Strategy**:
+- Load tasks-template.md as base
+- Generate tasks from Phase 1 design docs (contracts, data model, quickstart)
+- Each contract → contract test task [P]
+- Each entity → model creation task [P]
+- Each user story → integration test task
+- Implementation tasks to make tests pass
 
-#### Table: `table_name`
-```sql
-CREATE TABLE table_name (
-  id SERIAL PRIMARY KEY,
-  field1 VARCHAR(255) NOT NULL,
-  field2 TIMESTAMP DEFAULT NOW(),
-  field3 JSONB
-);
-```
+**Ordering Strategy**:
+- TDD order: Tests before implementation
+- Dependency order: Models before services before UI
+- Mark [P] for parallel execution (independent files)
 
-**Indexes**:
-```sql
-CREATE INDEX idx_field1 ON table_name(field1);
-```
+**Estimated Output**: 25-30 numbered, ordered tasks in tasks.md
 
-### Schema Migrations
+**IMPORTANT**: This phase is executed by the /tasks command, NOT by /plan
 
-| Migration | Type | Description | Reversible |
-|-----------|------|-------------|------------|
-|           |      |             | Yes/No     |
+## Phase 3+: Future Implementation
 
-## Integration Points
+*These phases are beyond the scope of the /plan command*
 
-### External Services
+**Phase 3**: Task execution (/tasks command creates tasks.md)
+**Phase 4**: Implementation (execute tasks.md following constitutional principles)
+**Phase 5**: Validation (run tests, execute quickstart.md, performance validation)
 
-#### Service 1: {Name}
-- **Purpose**: {Why we're integrating}
-- **Authentication**: {Method}
-- **Endpoints Used**: {List}
-- **Error Handling**: {Strategy}
-- **Rate Limits**: {Constraints}
+## Complexity Tracking
 
-### Internal APIs
+*Fill ONLY if Constitution Check has violations that must be justified*
 
-#### API 1: {Name}
-- **Purpose**: {Why we're integrating}
-- **Owned By**: {Team/Service}
-- **Contract**: {Link or description}
-- **Error Handling**: {Strategy}
+| Violation | Why Needed | Simpler Alternative Rejected Because |
+|-----------|------------|-------------------------------------|
+| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
+| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
 
-## Error Handling
+## Progress Tracking
 
-### Error Types
+*This checklist is updated during execution flow*
 
-```typescript
-enum FeatureErrorCode {
-  VALIDATION_ERROR = 'FEATURE_VALIDATION_ERROR',
-  NOT_FOUND = 'FEATURE_NOT_FOUND',
-  UNAUTHORIZED = 'FEATURE_UNAUTHORIZED',
-  SERVER_ERROR = 'FEATURE_SERVER_ERROR'
-}
-```
+**Phase Status**:
+- [ ] Phase 0: Research complete (/plan command)
+- [ ] Phase 1: Design complete (/plan command)
+- [ ] Phase 2: Task planning complete (/plan command - describe approach only)
+- [ ] Phase 3: Tasks generated (/tasks command)
+- [ ] Phase 4: Implementation complete
+- [ ] Phase 5: Validation passed
 
-### Error Recovery Strategies
-
-| Error Type | Recovery Strategy | User Experience |
-|------------|-------------------|-----------------|
-|            |                   |                 |
-
-## Testing Strategy
-
-### Unit Tests
-<!-- What needs unit testing -->
-
-- [ ] Component A rendering
-- [ ] Hook B logic
-- [ ] Service C functions
-- [ ] Utility D edge cases
-
-### Integration Tests
-<!-- What needs integration testing -->
-
-- [ ] Feature flow A to B
-- [ ] API endpoint integration
-- [ ] Database operations
-
-### E2E Tests
-<!-- Critical user flows to test end-to-end -->
-
-- [ ] User story 1 flow
-- [ ] User story 2 flow
-
-## Security Considerations
-
-### Authentication
-<!-- How users are authenticated -->
-
--
--
-
-### Authorization
-<!-- What permissions are needed -->
-
--
--
-
-### Data Protection
-<!-- How sensitive data is protected -->
-
--
--
-
-### Input Validation
-<!-- Where and how input is validated -->
-
--
--
-
-## Performance Considerations
-
-### Optimization Strategies
-<!-- Performance optimizations to implement -->
-
--
--
--
-
-### Monitoring
-<!-- What to monitor -->
-
--
--
--
-
-### Benchmarks
-<!-- Performance targets -->
-
-| Metric | Target | Measurement Method |
-|--------|--------|-------------------|
-|        |        |                   |
-
-## Implementation Phases
-
-### Phase 1: Foundation
-**Goal**: {What phase 1 achieves}
-**Duration Estimate**: {Rough estimate}
-
-- [ ] Task 1
-- [ ] Task 2
-- [ ] Task 3
-
-### Phase 2: Core Features
-**Goal**: {What phase 2 achieves}
-**Duration Estimate**: {Rough estimate}
-
-- [ ] Task 1
-- [ ] Task 2
-- [ ] Task 3
-
-### Phase 3: Polish and Launch
-**Goal**: {What phase 3 achieves}
-**Duration Estimate**: {Rough estimate}
-
-- [ ] Task 1
-- [ ] Task 2
-- [ ] Task 3
-
-## Rollout Strategy
-
-### Feature Flags
-<!-- Feature flags to control rollout -->
-
-| Flag Name | Purpose | Default State |
-|-----------|---------|---------------|
-|           |         | ON/OFF        |
-
-### Deployment Phases
-
-1. **Phase 1**: {Deploy to stage/test environment}
-2. **Phase 2**: {Deploy to 10% of users}
-3. **Phase 3**: {Deploy to 50% of users}
-4. **Phase 4**: {Deploy to 100% of users}
-
-### Rollback Plan
-<!-- How to rollback if issues occur -->
-
--
--
--
-
-## Monitoring and Observability
-
-### Metrics to Track
-<!-- Key metrics to monitor -->
-
--
--
--
-
-### Alerts to Configure
-<!-- Alerts that should trigger on-call -->
-
--
--
--
-
-### Dashboards
-<!-- Monitoring dashboards to create -->
-
--
--
--
-
-## Documentation Needs
-
-### User Documentation
-<!-- What users need to know -->
-
-- [ ] Feature guide
-- [ ] API documentation
-- [ ] Troubleshooting guide
-
-### Developer Documentation
-<!-- What developers need to know -->
-
-- [ ] Architecture documentation
-- [ ] API contracts
-- [ ] Contributing guide
-- [ ] Testing guide
-
-## Risk Mitigation
-
-| Risk | Mitigation Strategy | Status |
-|------|---------------------|---------|
-|      |                     | Not Started/In Progress/Complete |
-
-## Dependencies and Blockers
-
-### Blockers
-<!-- What's blocking implementation -->
-
--
--
-
-### Dependencies
-<!-- What needs to be done first -->
-
--
--
-
-## Open Questions
-
-<!-- Technical questions that need answers -->
-
-1. {Question 1}
-2. {Question 2}
-3. {Question 3}
+**Gate Status**:
+- [ ] Initial Constitution Check: PASS
+- [ ] Post-Design Constitution Check: PASS
+- [ ] All NEEDS CLARIFICATION resolved
+- [ ] Complexity deviations documented
 
 ---
 
-**Next Steps:**
-1. Review and refine plan with team
-2. Generate tasks → Run `/spec-kit:tasks`
-3. Validate consistency → Run `/spec-kit:analyze`
+*Based on Constitution - See `.claude/spec-kit/memory/constitution.md`*
