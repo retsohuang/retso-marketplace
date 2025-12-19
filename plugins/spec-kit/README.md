@@ -157,8 +157,11 @@ node scripts/dist/cli.js template spec-template --plugin-root ${CLAUDE_PLUGIN_RO
 # List artifacts for a feature
 node scripts/dist/cli.js artifacts .claude/spec-kit/specs/001-user-auth
 
-# Validate branch name
-node scripts/dist/cli.js validate-branch spec-kit/001-user-auth
+# Get current spec
+node scripts/dist/cli.js get-current-spec
+
+# Set current spec
+node scripts/dist/cli.js set-current-spec 001-user-auth
 ```
 
 **Benefits:**

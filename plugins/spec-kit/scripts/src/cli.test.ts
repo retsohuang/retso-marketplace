@@ -8,7 +8,6 @@ import {
   listFeatures,
   template,
   artifacts,
-  validateBranch,
   type FsLike,
 } from "./cli.js"
 
@@ -114,39 +113,6 @@ describe("feature listing", () => {
     if (result.success) {
       expect(result.data.totalFeatures).toBe(0)
       expect(result.data.features).toHaveLength(0)
-    }
-  })
-})
-
-// ============================================================================
-// BRANCH VALIDATION TESTS
-// ============================================================================
-
-describe("branch validation", () => {
-  test("validate correct branch format (spec-kit/001-feature-name)", () => {
-    const fs = createTestFs({
-      "/project/.claude/spec-kit/specs/001-user-auth/.keep": "",
-    })
-
-    const result = validateBranch("spec-kit/001-user-auth", "/project", fs)
-
-    expect(result.success).toBe(true)
-    if (result.success) {
-      expect(result.data.valid).toBe(true)
-      expect(result.data.featureNumber).toBe(1)
-      expect(result.data.featureName).toBe("user-auth")
-    }
-  })
-
-  test("reject invalid branch formats", () => {
-    const fs = createTestFs({})
-
-    const result = validateBranch("invalid-branch", "/project", fs)
-
-    expect(result.success).toBe(true)
-    if (result.success) {
-      expect(result.data.valid).toBe(false)
-      expect(result.data.reason).toContain("must match format")
     }
   })
 })

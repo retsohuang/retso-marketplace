@@ -14,18 +14,24 @@ Design the technical approach for implementing a feature. This creates a detaile
 /spec-kit:plan
 ```
 
-Must be run from within a feature branch (e.g., `spec-kit/001-feature-name`).
+Optionally specify a spec: `/spec-kit:plan 001` or `/spec-kit:plan user-auth`
 
 ## Process
 
-### Step 1: Validate Context
+### Step 1: Get Current Spec Context
 
-Check the current branch:
+Use the get-current-spec skill to determine which spec to work with.
 
-```bash
-CURRENT_BRANCH=$(git branch --show-current)
-node ${CLAUDE_PLUGIN_ROOT}/scripts/dist/cli.js validate-branch "$CURRENT_BRANCH"
-```
+The skill will:
+1. Check if user mentioned a spec in their input (e.g., "001", "user-auth")
+2. Read from progress.yml if no spec mentioned
+3. Prompt user to select if neither available
+4. Update progress.yml via set-current-spec skill when a new spec is chosen
+
+After the skill completes, you will have:
+- Feature number: {NNN}
+- Feature name: {feature-name}
+- Feature directory: .claude/spec-kit/specs/{NNN}-{feature-name}/
 
 ### Step 2: Read Specification and Constitution
 

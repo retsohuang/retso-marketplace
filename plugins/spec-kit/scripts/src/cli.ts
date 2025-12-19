@@ -1,15 +1,8 @@
 #!/usr/bin/env node
 
-import {
-  currentBranch,
-  findRoot,
-  checkout,
-  branch as gitBranch,
-  listBranches,
-  type PromiseFsClient,
-} from "isomorphic-git"
+import { type PromiseFsClient } from "isomorphic-git"
 import * as nodeFs from "node:fs"
-import { join, dirname } from "node:path"
+import { join } from "node:path"
 
 const DEFAULT_DIR = process.cwd()
 
@@ -89,20 +82,19 @@ function init(
 }
 
 interface CreateFeatureResult {
-  branchName: string
+  specId: string
   featureDir: string
   featureNumber: number
 }
 
-async function createFeature(
+function createFeature(
   shortName: string,
   pluginRoot: string,
   dir: string = DEFAULT_DIR,
   fs: FsLike = defaultFs,
-): Promise<Output<CreateFeatureResult>> {
+): Output<CreateFeatureResult> {
   try {
-    const gitDir = await findRoot({ fs, filepath: dir })
-    const specsDir = join(gitDir, ".claude", "spec-kit", "specs")
+    const specsDir = join(dir, ".claude", "spec-kit", "specs")
 
     if (!fs.existsSync(specsDir)) {
       return error("Spec-kit not initialized. Run: /spec-kit:init")
@@ -129,8 +121,8 @@ async function createFeature(
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9-]/g, "")
 
-    const featureDir = join(specsDir, `${paddedNumber}-${normalizedName}`)
-    const branchName = `spec-kit/${paddedNumber}-${normalizedName}`
+    const specId = `${paddedNumber}-${normalizedName}`
+    const featureDir = join(specsDir, specId)
 
     if (fs.existsSync(featureDir)) {
       return error(`Feature directory already exists: ${featureDir}`)
@@ -139,15 +131,13 @@ async function createFeature(
     fs.mkdirSync(featureDir, { recursive: true })
     fs.mkdirSync(join(featureDir, "checklists"), { recursive: true })
 
-    try {
-      await gitBranch({ fs, dir: gitDir, ref: branchName })
-      await checkout({ fs, dir: gitDir, ref: branchName })
-    } catch (err) {
-      return error(`Failed to create branch: ${(err as Error).message}`)
+    const setResult = setCurrentSpec(specId, dir, fs)
+    if (!setResult.success) {
+      return error(`Failed to set current spec: ${setResult.error}`)
     }
 
     return success({
-      branchName,
+      specId,
       featureDir,
       featureNumber: nextNumber,
     })
@@ -296,59 +286,80 @@ function artifacts(
   }
 }
 
-interface ValidateBranchResult {
-  valid: boolean
+interface GetCurrentSpecResult {
+  currentSpec: string | null
   featureNumber?: number
   featureName?: string
   featureDir?: string
-  reason?: string
 }
 
-function validateBranch(
-  branchName: string,
+function getCurrentSpec(
   dir: string = DEFAULT_DIR,
   fs: FsLike = defaultFs,
-): Output<ValidateBranchResult> {
+): Output<GetCurrentSpecResult> {
   try {
-    // Expected format: spec-kit/NNN-feature-name
-    const match = branchName.match(/^spec-kit\/(\d{3})-(.+)$/)
+    const progressPath = join(dir, ".claude", "spec-kit", "memory", "progress.yml")
 
-    if (!match) {
-      return success({
-        valid: false,
-        reason: "Branch name must match format: spec-kit/NNN-feature-name",
-      })
+    if (!fs.existsSync(progressPath)) {
+      return success({ currentSpec: null })
     }
 
-    const featureNumber = parseInt(match[1], 10)
-    const featureName = match[2]
-    const featureDir = join(
-      dir,
-      ".claude",
-      "spec-kit",
-      "specs",
-      `${match[1]}-${featureName}`,
-    )
+    const content = fs.readFileSync(progressPath, "utf-8")
+    const match = content.match(/currentSpec:\s*"?([^"\n]+)"?/)
 
-    const dirExists = fs.existsSync(featureDir)
-
-    if (!dirExists) {
-      return success({
-        valid: false,
-        featureNumber,
-        featureName,
-        reason: `Feature directory not found: ${featureDir}`,
-      })
+    if (!match || !match[1] || match[1] === "null" || match[1].trim() === "") {
+      return success({ currentSpec: null })
     }
+
+    const currentSpec = match[1].trim()
+    const specMatch = currentSpec.match(/^(\d{3})-(.+)$/)
+
+    if (!specMatch) {
+      return success({ currentSpec: null })
+    }
+
+    const featureDir = join(dir, ".claude", "spec-kit", "specs", currentSpec)
 
     return success({
-      valid: true,
-      featureNumber,
-      featureName,
-      featureDir,
+      currentSpec,
+      featureNumber: parseInt(specMatch[1], 10),
+      featureName: specMatch[2],
+      featureDir: fs.existsSync(featureDir) ? featureDir : undefined,
     })
   } catch (err) {
-    return error(`Failed to validate branch: ${(err as Error).message}`)
+    return error(`Failed to get current spec: ${(err as Error).message}`)
+  }
+}
+
+interface SetCurrentSpecResult {
+  currentSpec: string
+  featureDir: string
+}
+
+function setCurrentSpec(
+  specId: string,
+  dir: string = DEFAULT_DIR,
+  fs: FsLike = defaultFs,
+): Output<SetCurrentSpecResult> {
+  try {
+    const specsDir = join(dir, ".claude", "spec-kit", "specs")
+    const featureDir = join(specsDir, specId)
+
+    if (!fs.existsSync(featureDir)) {
+      return error(`Spec directory not found: ${featureDir}`)
+    }
+
+    const memoryDir = join(dir, ".claude", "spec-kit", "memory")
+    if (!fs.existsSync(memoryDir)) {
+      fs.mkdirSync(memoryDir, { recursive: true })
+    }
+
+    const progressPath = join(memoryDir, "progress.yml")
+    fs.writeFileSync(progressPath, `currentSpec: "${specId}"\n`)
+
+    return success({ currentSpec: specId, featureDir })
+  } catch (err) {
+    return error(`Failed to set current spec: ${(err as Error).message}`)
   }
 }
 
@@ -390,7 +401,7 @@ Commands:
     Initialize project for spec-kit
 
   create-feature <short-name> --plugin-root <path>
-    Create new feature with sequential numbering and git branch
+    Create new feature with sequential numbering and set as current spec
 
   list-features [--plugin-root <path>]
     List all existing features
@@ -401,8 +412,11 @@ Commands:
   artifacts <feature-dir>
     List artifacts in a feature directory
 
-  validate-branch <branch-name>
-    Validate branch name format and check if feature directory exists
+  get-current-spec
+    Get the current working spec from progress.yml
+
+  set-current-spec <spec-id>
+    Set the current working spec in progress.yml (e.g., 001-user-auth)
 
 Options:
   --plugin-root <path>    Path to plugin root directory
@@ -414,7 +428,8 @@ Examples:
   cli.js list-features
   cli.js template spec-template --plugin-root /path/to/plugin
   cli.js artifacts .claude/spec-kit/specs/001-user-auth
-  cli.js validate-branch spec-kit/001-user-auth
+  cli.js get-current-spec
+  cli.js set-current-spec 001-user-auth
 `)
 }
 
@@ -424,14 +439,16 @@ export {
   listFeatures,
   template,
   artifacts,
-  validateBranch,
+  getCurrentSpec,
+  setCurrentSpec,
   type FsLike,
   type Output,
   type InitResult,
   type CreateFeatureResult,
   type ListFeaturesResult,
   type ArtifactsResult,
-  type ValidateBranchResult,
+  type GetCurrentSpecResult,
+  type SetCurrentSpecResult,
 }
 
 async function main(): Promise<void> {
@@ -476,7 +493,7 @@ async function main(): Promise<void> {
           process.exit(1)
         }
 
-        const result = await createFeature(
+        const result = createFeature(
           parsedArgs.positional as string,
           parsedArgs.pluginRoot as string,
         )
@@ -546,14 +563,26 @@ async function main(): Promise<void> {
         break
       }
 
-      case "validate-branch": {
-        if (!parsedArgs.positional) {
-          console.error("Error: branch name is required")
-          console.error("Usage: cli.js validate-branch <branch-name>")
+      case "get-current-spec": {
+        const result = getCurrentSpec()
+
+        if (!result.success) {
+          console.error("Error:", result.error)
           process.exit(1)
         }
 
-        const result = validateBranch(parsedArgs.positional as string)
+        console.log(JSON.stringify(result, null, 2))
+        break
+      }
+
+      case "set-current-spec": {
+        if (!parsedArgs.positional) {
+          console.error("Error: spec ID is required")
+          console.error("Usage: cli.js set-current-spec <spec-id>")
+          process.exit(1)
+        }
+
+        const result = setCurrentSpec(parsedArgs.positional as string)
 
         if (!result.success) {
           console.error("Error:", result.error)

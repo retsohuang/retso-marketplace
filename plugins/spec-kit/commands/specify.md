@@ -45,10 +45,9 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/dist/cli.js create-feature <feature-name> --p
 This will:
 - Determine the next feature number (e.g., 001, 002, 003)
 - Create `.claude/spec-kit/specs/{NNN}-{feature-name}/`
-- Create git branch `spec-kit/{NNN}-{feature-name}`
-- Check out the new branch
+- Set this spec as the current working spec in `progress.yml`
 
-The CLI outputs JSON with the branch name, feature directory, and feature number.
+The CLI outputs JSON with the spec ID, feature directory, and feature number.
 
 ### Step 3: Read Constitution
 
@@ -124,18 +123,18 @@ Ensure the spec aligns with the project constitution:
 Display what was created:
 
 ```
-✅ Specification Created!
+Specification Created!
 
 Feature: {NNN}-{feature-name}
-Branch: spec-kit/{NNN}-{feature-name}
 Location: .claude/spec-kit/specs/{NNN}-{feature-name}/spec.md
+Current Spec: Set in progress.yml
 
 Sections Completed:
-- ✅ Overview (problem, solution, goals)
-- ✅ User Stories ({count} stories, {count} acceptance criteria)
-- ✅ Requirements (FR: {count}, NFR: {count}, TR: {count})
-- ✅ Data Models ({count} models)
-- ✅ Success Metrics ({count} metrics)
+- Overview (problem, solution, goals)
+- User Stories ({count} stories, {count} acceptance criteria)
+- Requirements (FR: {count}, NFR: {count}, TR: {count})
+- Data Models ({count} models)
+- Success Metrics ({count} metrics)
 
 Next Steps:
 1. Review and refine: .claude/spec-kit/specs/{NNN}-{feature-name}/spec.md
@@ -196,7 +195,7 @@ Tip: Run /spec-kit:clarify to identify and resolve any unclear requirements.
 
 - If spec-kit not initialized, direct user to `/spec-kit:init`
 - If feature name contains spaces or invalid characters, normalize it
-- If git branch creation fails, report the error clearly
+- If feature directory creation fails, report the error clearly
 - If user provides insufficient information, ask clarifying questions
 
 ## Notes
