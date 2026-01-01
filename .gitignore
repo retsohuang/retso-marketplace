@@ -33,3 +33,4 @@ build/
 *.log
 .mcp.json
 .letta/settings.local.json
+.claude/

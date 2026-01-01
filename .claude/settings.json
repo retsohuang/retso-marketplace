@@ -1,8 +1,0 @@
-{
-  "enabledPlugins": {
-    "commit-commands@claude-plugins-official": true,
-    "github-tools@retso-marketplace": true,
-    "plugin-dev@claude-plugins-official": true,
-    "spec-kit@retso-marketplace": true
-  }
-}
