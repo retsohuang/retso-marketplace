@@ -3,14 +3,12 @@ pre-commit:
   commands:
     # TypeScript/JavaScript - Linting
     js-lint:
-      root: 'plugins/code-review-tools/scripts/'
-      glob: '**/*.{ts,js}'
+      glob: 'plugins/*/scripts/**/*.{ts,js}'
       exclude: "(dist|node_modules|\\.claude)/.*"
-      run: bun run lint {staged_files}
+      run: bun run lint
 
     # TypeScript/JavaScript - Formatting
     js-format:
-      root: 'plugins/code-review-tools/scripts/'
-      glob: '**/*.{ts,js,json}'
+      glob: 'plugins/*/scripts/**/*.{ts,js,json}'
       exclude: "(dist|node_modules|\\.claude)/.*"
-      run: bun run format {staged_files}
+      run: bun run format
