@@ -1,0 +1,27 @@
+{
+  "name": "plugin-kit",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "plugin-kit": "./src/cli.tsx"
+  },
+  "scripts": {
+    "build": "bun run scripts/build.ts",
+    "dev": "bun run build && ./dist/plugin-kit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "ink": "^6.5.1",
+    "ink-text-input": "^6.0.0",
+    "react": "^19.2.3",
+    "react-devtools-core": "^7.0.1",
+    "yaml": "^2.8.2",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/react": "^19.2.7",
+    "typescript": "^5.9.3"
+  }
+}
