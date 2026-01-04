@@ -34,3 +34,4 @@ build/
 *.log
 *.bun-build
 */dist/
+cli/src/generated/
