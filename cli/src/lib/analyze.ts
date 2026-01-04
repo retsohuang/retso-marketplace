@@ -2,17 +2,70 @@ import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { AnalysisResult } from '../types/plugin'
 
-const BROKEN_REFERENCES = [
-  { pattern: /rules\//g, message: 'references rules/ directory' },
-  { pattern: /templates\//g, message: 'references templates/ directory' },
-  { pattern: /scripts\//g, message: 'references scripts/ directory' },
-  { pattern: /scripts\/dist\//g, message: 'references scripts/dist/' },
-  { pattern: /CLAUDE_PLUGIN_ROOT/g, message: 'uses CLAUDE_PLUGIN_ROOT variable' },
+/**
+ * Directories supported in .claude directory structure.
+ * Based on Claude Code documentation:
+ * https://docs.anthropic.com/en/docs/claude-code
+ *
+ * Supported:
+ * - commands/ - Custom slash commands (.md files)
+ * - agents/ - Project-level subagents (.md files)
+ * - settings.json - Project-level configuration
+ * - settings.local.json - Personal project overrides
+ * - CLAUDE.md - Project documentation
+ * - CLAUDE.local.md - Personal working info
+ *
+ * NOT supported (plugin-only):
+ * - scripts/ - Build scripts, CLI tools
+ * - rules/ - Code review rules
+ * - templates/ - File templates
+ * - hooks/ - Hook scripts (config goes in settings.json)
+ */
+const SUPPORTED_IN_CLAUDE = new Set(['commands', 'agents', 'skills'])
+
+/**
+ * Plugin-specific features that won't work when installed to .claude
+ */
+const PLUGIN_ONLY_PATTERNS = [
+  { pattern: /CLAUDE_PLUGIN_ROOT/g, message: 'uses CLAUDE_PLUGIN_ROOT (plugin-only variable)' },
 ]
+
+/**
+ * Check if plugin has directories that won't be installed to .claude
+ */
+async function findUnsupportedDirectories(pluginPath: string): Promise<string[]> {
+  const unsupported: string[] = []
+
+  try {
+    const entries = await readdir(pluginPath, { withFileTypes: true })
+    for (const entry of entries) {
+      if (entry.isDirectory() && !SUPPORTED_IN_CLAUDE.has(entry.name)) {
+        // Check if this is a directory we care about (not hidden, not node_modules, etc.)
+        if (!entry.name.startsWith('.') && entry.name !== 'node_modules') {
+          unsupported.push(entry.name)
+        }
+      }
+    }
+  } catch {
+    // Directory doesn't exist
+  }
+
+  return unsupported
+}
+
+/**
+ * Check if content references a specific directory
+ */
+function referencesDirectory(content: string, dirName: string): boolean {
+  // Match patterns like: scripts/dist, rules/foo, templates/bar
+  const pattern = new RegExp(`\\b${dirName}/`, 'g')
+  return pattern.test(content)
+}
 
 async function scanMarkdownFile(
   filePath: string,
   pluginPath: string,
+  unsupportedDirs: string[],
 ): Promise<string[]> {
   const warnings: string[] = []
 
@@ -20,10 +73,18 @@ async function scanMarkdownFile(
     const content = await readFile(filePath, 'utf-8')
     const relativePath = filePath.replace(pluginPath + '/', '')
 
-    for (const { pattern, message } of BROKEN_REFERENCES) {
+    // Check for plugin-only patterns
+    for (const { pattern, message } of PLUGIN_ONLY_PATTERNS) {
       if (pattern.test(content)) {
         warnings.push(`${relativePath} ${message}`)
         pattern.lastIndex = 0
+      }
+    }
+
+    // Check for references to unsupported plugin directories
+    for (const dir of unsupportedDirs) {
+      if (referencesDirectory(content, dir)) {
+        warnings.push(`${relativePath} references ${dir}/ (not installed to .claude)`)
       }
     }
   } catch {
@@ -36,6 +97,7 @@ async function scanMarkdownFile(
 async function scanDirectory(
   dirPath: string,
   pluginPath: string,
+  unsupportedDirs: string[],
 ): Promise<string[]> {
   const warnings: string[] = []
 
@@ -46,10 +108,10 @@ async function scanDirectory(
       const fullPath = join(dirPath, entry.name)
 
       if (entry.isDirectory()) {
-        const subWarnings = await scanDirectory(fullPath, pluginPath)
+        const subWarnings = await scanDirectory(fullPath, pluginPath, unsupportedDirs)
         warnings.push(...subWarnings)
       } else if (entry.name.endsWith('.md')) {
-        const fileWarnings = await scanMarkdownFile(fullPath, pluginPath)
+        const fileWarnings = await scanMarkdownFile(fullPath, pluginPath, unsupportedDirs)
         warnings.push(...fileWarnings)
       }
     }
@@ -63,19 +125,22 @@ async function scanDirectory(
 export async function analyzePlugin(pluginPath: string): Promise<AnalysisResult> {
   const warnings: string[] = []
 
+  // Find directories in plugin that won't be installed to .claude
+  const unsupportedDirs = await findUnsupportedDirectories(pluginPath)
+
   // Scan commands directory
   const commandsDir = join(pluginPath, 'commands')
-  const commandWarnings = await scanDirectory(commandsDir, pluginPath)
+  const commandWarnings = await scanDirectory(commandsDir, pluginPath, unsupportedDirs)
   warnings.push(...commandWarnings)
 
   // Scan agents directory
   const agentsDir = join(pluginPath, 'agents')
-  const agentWarnings = await scanDirectory(agentsDir, pluginPath)
+  const agentWarnings = await scanDirectory(agentsDir, pluginPath, unsupportedDirs)
   warnings.push(...agentWarnings)
 
-  // Scan skills directory
+  // Scan skills directory (skills/ is special - installed as-is)
   const skillsDir = join(pluginPath, 'skills')
-  const skillWarnings = await scanDirectory(skillsDir, pluginPath)
+  const skillWarnings = await scanDirectory(skillsDir, pluginPath, unsupportedDirs)
   warnings.push(...skillWarnings)
 
   return {

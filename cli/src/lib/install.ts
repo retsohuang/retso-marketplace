@@ -5,7 +5,6 @@ import type {
   ExistingPlugin,
   InstalledItems,
   InstallResult,
-  PluginManifest,
   PluginWithContent,
 } from '../types/plugin'
 import { PluginManifestSchema } from '../types/plugin'
