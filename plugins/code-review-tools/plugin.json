@@ -7,20 +7,7 @@
     "email": "retsohuang@gmail.com"
   },
   "license": "MIT",
-  "keywords": [
-    "code-review",
-    "git",
-    "quality",
-    "components",
-    "custom-rules"
-  ],
-  "commands": [
-    "./commands/create-rule.md",
-    "./commands/init.md",
-    "./commands/review.md"
-  ],
-  "agents": [
-    "./agents/commit-reviewer.md",
-    "./agents/report-writer.md"
-  ]
+  "keywords": ["code-review", "git", "quality", "components", "custom-rules"],
+  "commands": ["./commands/review.md"],
+  "skills": ["./skills/code-review"]
 }

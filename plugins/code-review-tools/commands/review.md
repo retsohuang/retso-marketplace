@@ -1,13 +1,12 @@
 ---
 description: Review code changes commit-by-commit like a human reviewer
 argument-hint: <commit-hash>
-allowed-tools: Bash
-model: claude-sonnet-4-5
+allowed-tools: Skill
 ---
 
 # Code Review
 
-Review changes from a starting commit hash to HEAD, analyzing each commit individually and leaving inline comments at specific lines of code, just like a human code reviewer would on a merge request.
+Review changes from a starting commit hash to HEAD, analyzing each commit individually like a human code reviewer would on a merge request.
 
 ## Usage
 
@@ -19,102 +18,17 @@ Where `<commit-hash>` is the starting commit to review from (reviews changes fro
 
 ## Instructions
 
-Parse the `<commit-hash>` from `$ARGUMENTS` and review changes commit-by-commit from that commit to HEAD.
+Invoke the `code-review-tools:code-review` skill with the commit hash from `$ARGUMENTS`:
 
-```bash
-# Parse arguments
-COMMIT_HASH="$ARGUMENTS"
+```
+/code-review-tools:code-review $ARGUMENTS
 ```
 
-### Step 1: Prepare Review Data
+The skill handles the entire review workflow:
 
-Run the CLI to prepare all review data as a single JSON object:
+1. Preparing commit data using the CLI
+2. Asking which commits to review
+3. Loading review rules and analyzing each commit
+4. Generating a formatted summary
 
-```bash
-if [ -z "$COMMIT_HASH" ]; then
-  echo "ERROR: No commit hash provided"
-  echo "Usage: /code-review-tools:review <commit-hash>"
-  exit 1
-fi
-
-REVIEW_DATA=$(node ${CLAUDE_PLUGIN_ROOT}/scripts/dist/cli.js prepare "$COMMIT_HASH" --plugin-root ${CLAUDE_PLUGIN_ROOT})
-
-if [ $? -ne 0 ]; then
-  echo "ERROR: Failed to prepare review data"
-  echo "$REVIEW_DATA"
-  exit 1
-fi
-```
-
-### Step 2: Invoke Report Writer Agent
-
-Invoke the `report-writer` agent with the prepared JSON data directly. The CLI outputs a structured JSON object containing all necessary artifacts:
-
-```json
-{
-  "success": true,
-  "data": {
-    "commits": [...],
-    "commitList": ["sha1", "sha2", ...],
-    "branch": "feature-branch",
-    "commitRange": "abc123..HEAD",
-    "totalCommits": 5,
-    "rulesContent": "...",
-    "reportTemplate": "...",
-    "summaryTemplate": "...",
-    "outputDirectory": ".claude/code-review-tools/reports",
-    "maxConcurrentAgents": 0
-  }
-}
-```
-
-**Agent invocation:**
-
-- Agent name: `report-writer`
-- Input: Pass `$REVIEW_DATA` directly as JSON
-- Output: Terminal summary (report file is written by the agent)
-
-The agent will handle:
-
-- Parsing the JSON input to extract commits, rules, templates, and config
-- Spawning commit-reviewer agents for each commit
-- Aggregating and deduplicating results
-- Writing the report file
-- Returning the terminal summary
-
-### Step 3: Display Results
-
-**CRITICAL**: Display the report-writer agent's output EXACTLY as returned, without modification.
-
-The agent returns a properly formatted markdown summary with:
-
-- A summary table (Commits | Files | Issues)
-- Review process details
-- Top issues list
-- Key recommendations
-- File path to full report
-
-**Do NOT**:
-
-- Rewrite the summary in your own words
-- Convert the table to prose
-- Add conversational preambles like "The review found..."
-- Summarize or paraphrase the agent's output
-
-**Do**:
-
-- Output the agent's response verbatim
-- Prefix with `=== Code Review Complete ===` header only
-
-```bash
-echo "=== Code Review Complete ==="
-echo ""
-# Output the agent's response EXACTLY as returned (do not rewrite)
-echo "$AGENT_OUTPUT"
-```
-
-**Output Behavior:**
-
-- Terminal displays: Agent's formatted summary with table (verbatim)
-- File contains: Complete detailed report with all issues and code snippets
-- All orchestration happens inside the report-writer agent
+Pass through all output from the skill without modification.
