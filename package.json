@@ -1,10 +1,26 @@
 {
   "private": true,
-  "devDependencies": {
-    "lefthook": "^1.11.5"
-  },
+  "workspaces": ["plugins/*/scripts", "cli"],
   "scripts": {
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "build": "bun run --filter '*' build",
+    "test": "bun run --filter '*' test",
+    "typecheck": "bun run --filter '*' typecheck",
+    "lint": "bun run --filter '*' lint",
+    "format": "bun run --filter '*' format"
+  },
+  "dependencies": {
+    "isomorphic-git": "^1.36.0",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.3",
+    "@types/node": "^20.0.0",
+    "lefthook": "^1.11.5",
+    "memfs": "^4.51.1",
+    "oxlint": "^0.16.6",
+    "prettier": "^3.7.4",
+    "typescript": "^5.0.0"
   }
 }
 

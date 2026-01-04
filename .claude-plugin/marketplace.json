@@ -6,12 +6,12 @@
     "email": "retsohuang@gmail.com"
   },
   "description": "Custom marketplace for Claude Code plugins",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "plugins": [
     {
       "name": "code-review-tools",
       "description": "Review code changes commit-by-commit with custom rules support. Includes interactive setup and rule creation.",
-      "version": "2.1.0",
+      "version": "2.1.1",
       "source": "./plugins/code-review-tools",
       "author": {
         "name": "Retso Huang",
@@ -30,7 +30,7 @@
     {
       "name": "github-tools",
       "description": "GitHub workflow tools for daily development. Analyze PR review comments and categorize what needs fixing.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./plugins/github-tools",
       "author": {
         "name": "Retso Huang",
@@ -42,6 +42,26 @@
         "pr",
         "code-review",
         "workflow"
+      ],
+      "category": "development"
+    },
+    {
+      "name": "spec-kit",
+      "description": "Spec-Driven Development toolkit for Claude Code. Create specifications, plans, and tasks following a structured workflow from requirements to implementation.",
+      "version": "0.1.0",
+      "source": "./plugins/spec-kit",
+      "author": {
+        "name": "Retso Huang",
+        "email": "retsohuang@gmail.com"
+      },
+      "license": "MIT",
+      "keywords": [
+        "spec-driven-development",
+        "specifications",
+        "planning",
+        "requirements",
+        "workflow",
+        "development"
       ],
       "category": "development"
     }
