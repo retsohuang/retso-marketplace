@@ -1,6 +1,19 @@
-import { readdir, readFile } from 'node:fs/promises'
+import * as nodeFs from 'node:fs/promises'
 import { join } from 'node:path'
 import type { AnalysisResult } from '../types/plugin'
+
+/**
+ * File system interface for dependency injection (testing with memfs)
+ */
+export type FsLike = {
+  readdir: typeof nodeFs.readdir
+  readFile: typeof nodeFs.readFile
+}
+
+const defaultFs: FsLike = {
+  readdir: nodeFs.readdir,
+  readFile: nodeFs.readFile,
+}
 
 /**
  * Directories supported in .claude directory structure.
@@ -21,7 +34,7 @@ import type { AnalysisResult } from '../types/plugin'
  * - templates/ - File templates
  * - hooks/ - Hook scripts (config goes in settings.json)
  */
-const SUPPORTED_IN_CLAUDE = new Set(['commands', 'agents', 'skills'])
+export const SUPPORTED_IN_CLAUDE = new Set(['commands', 'agents', 'skills'])
 
 /**
  * Plugin-specific features that won't work when installed to .claude
@@ -33,11 +46,14 @@ const PLUGIN_ONLY_PATTERNS = [
 /**
  * Check if plugin has directories that won't be installed to .claude
  */
-async function findUnsupportedDirectories(pluginPath: string): Promise<string[]> {
+async function findUnsupportedDirectories(
+  pluginPath: string,
+  fs: FsLike,
+): Promise<string[]> {
   const unsupported: string[] = []
 
   try {
-    const entries = await readdir(pluginPath, { withFileTypes: true })
+    const entries = await fs.readdir(pluginPath, { withFileTypes: true })
     for (const entry of entries) {
       if (entry.isDirectory() && !SUPPORTED_IN_CLAUDE.has(entry.name)) {
         // Check if this is a directory we care about (not hidden, not node_modules, etc.)
@@ -66,11 +82,12 @@ async function scanMarkdownFile(
   filePath: string,
   pluginPath: string,
   unsupportedDirs: string[],
+  fs: FsLike,
 ): Promise<string[]> {
   const warnings: string[] = []
 
   try {
-    const content = await readFile(filePath, 'utf-8')
+    const content = await fs.readFile(filePath, 'utf-8')
     const relativePath = filePath.replace(pluginPath + '/', '')
 
     // Check for plugin-only patterns
@@ -98,20 +115,21 @@ async function scanDirectory(
   dirPath: string,
   pluginPath: string,
   unsupportedDirs: string[],
+  fs: FsLike,
 ): Promise<string[]> {
   const warnings: string[] = []
 
   try {
-    const entries = await readdir(dirPath, { withFileTypes: true })
+    const entries = await fs.readdir(dirPath, { withFileTypes: true })
 
     for (const entry of entries) {
       const fullPath = join(dirPath, entry.name)
 
       if (entry.isDirectory()) {
-        const subWarnings = await scanDirectory(fullPath, pluginPath, unsupportedDirs)
+        const subWarnings = await scanDirectory(fullPath, pluginPath, unsupportedDirs, fs)
         warnings.push(...subWarnings)
       } else if (entry.name.endsWith('.md')) {
-        const fileWarnings = await scanMarkdownFile(fullPath, pluginPath, unsupportedDirs)
+        const fileWarnings = await scanMarkdownFile(fullPath, pluginPath, unsupportedDirs, fs)
         warnings.push(...fileWarnings)
       }
     }
@@ -122,25 +140,28 @@ async function scanDirectory(
   return warnings
 }
 
-export async function analyzePlugin(pluginPath: string): Promise<AnalysisResult> {
+export async function analyzePlugin(
+  pluginPath: string,
+  fs: FsLike = defaultFs,
+): Promise<AnalysisResult> {
   const warnings: string[] = []
 
   // Find directories in plugin that won't be installed to .claude
-  const unsupportedDirs = await findUnsupportedDirectories(pluginPath)
+  const unsupportedDirs = await findUnsupportedDirectories(pluginPath, fs)
 
   // Scan commands directory
   const commandsDir = join(pluginPath, 'commands')
-  const commandWarnings = await scanDirectory(commandsDir, pluginPath, unsupportedDirs)
+  const commandWarnings = await scanDirectory(commandsDir, pluginPath, unsupportedDirs, fs)
   warnings.push(...commandWarnings)
 
   // Scan agents directory
   const agentsDir = join(pluginPath, 'agents')
-  const agentWarnings = await scanDirectory(agentsDir, pluginPath, unsupportedDirs)
+  const agentWarnings = await scanDirectory(agentsDir, pluginPath, unsupportedDirs, fs)
   warnings.push(...agentWarnings)
 
   // Scan skills directory (skills/ is special - installed as-is)
   const skillsDir = join(pluginPath, 'skills')
-  const skillWarnings = await scanDirectory(skillsDir, pluginPath, unsupportedDirs)
+  const skillWarnings = await scanDirectory(skillsDir, pluginPath, unsupportedDirs, fs)
   warnings.push(...skillWarnings)
 
   return {

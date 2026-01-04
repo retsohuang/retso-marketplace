@@ -9,6 +9,7 @@
   "scripts": {
     "build": "bun run scripts/build.ts",
     "dev": "bun run build && ./dist/plugin-kit",
+    "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@types/bun": "latest",
     "@types/react": "^19.2.7",
+    "memfs": "^4.17.2",
     "typescript": "^5.9.3"
   }
 }
