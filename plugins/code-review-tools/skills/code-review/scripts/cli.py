@@ -84,7 +84,7 @@ def get_commit_diff(commit_hash: str) -> str:
     return run_git(['show', '--patch', '--stat', '--color=never', commit_hash])
 
 
-def escape_toon(s: str) -> str:
+def escape_toon(s: Optional[str]) -> str:
     """Escape a string for TOON format"""
     if s is None:
         return 'null'
@@ -136,7 +136,7 @@ def get_current_branch() -> str:
     try:
         output = run_git(['rev-parse', '--abbrev-ref', 'HEAD'])
         return output.strip()
-    except:
+    except Exception:
         return 'HEAD'
 
 

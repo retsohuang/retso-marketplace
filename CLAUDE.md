@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Retso Marketplace is a custom plugin marketplace for Claude Code. It's a Bun monorepo containing plugins, a CLI installer, and the marketplace registry.
 
-## Verion Bumping
+## Version Bumping
 
 Only bump versions when explicitly requested.
 
