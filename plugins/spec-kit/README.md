@@ -4,468 +4,229 @@ Spec-Driven Development toolkit for Claude Code. Create specifications, plans, a
 
 ## Overview
 
-This plugin brings GitHub's spec-kit methodology to Claude Code, enabling a systematic approach to software development that starts with specifications and flows through to implementation.
+This plugin brings spec-driven development methodology to Claude Code, enabling a systematic approach to software development that starts with specifications and flows through to implementation.
 
 **Key Features:**
-- **Structured workflow**: From constitution → specifications → plans → tasks → implementation
-- **Sequential feature tracking**: Automatic numbering and branch management for features
-- **Template-driven**: Consistent format for all spec artifacts
-- **Git integration**: Automatic branch creation and feature directory management
-- **Quality validation**: Analyze cross-artifact consistency before implementation
-- **Interactive clarification**: Ask targeted questions to resolve ambiguities
+
+- **Three-skill workflow**: spec-workflow → spec-to-plan → plan-to-code
+- **Stage progression**: Each artifact progresses through stages (Draft → Waiting for Validation → Ready)
+- **Embedded implementation details**: Tasks include all code samples and patterns for immediate execution
+- **Parallelization markers**: Tasks marked with `[P]` can run simultaneously
 
 ## Quick Start
 
-### 1. Initialize Your Project
+### 1. Create a Specification
 
-Set up spec-kit in your project:
+Ask Claude to create a spec for your feature:
 
-```bash
-/spec-kit:init
+```
+Create a spec for user authentication with email/password login
 ```
 
-This will:
-- Create `.claude/spec-kit/memory/` for project governance
-- Create `.claude/spec-kit/specs/` for feature specifications
-- Generate a constitution template with project principles
+The **spec-workflow** skill will:
+- Create `specs/001-user-authentication/spec.md`
+- Focus on WHAT users need and WHY (not HOW)
+- Mark unknowns with `[NEEDS CLARIFICATION]` markers
 
-### 2. Create a Specification
+### 2. Clarify and Validate the Spec
 
-Define requirements for a new feature:
-
-```bash
-/spec-kit:specify <feature-name>
+```
+Clarify the spec
 ```
 
-**Example:**
-```bash
-/spec-kit:specify user-authentication
-```
-
-This will:
-- Create `.claude/spec-kit/specs/001-user-authentication/`
-- Generate `spec.md` with requirements and user stories
-- Create git branch `spec-kit/001-user-authentication`
+The skill will ask questions to resolve ambiguities, then validate readiness for planning.
 
 ### 3. Create an Implementation Plan
 
-Design the technical approach:
-
-```bash
-/spec-kit:plan
+```
+Create a plan for the user-authentication spec
 ```
 
-This will:
-- Read your `spec.md` and `constitution.md`
-- Generate `plan.md` with architectural decisions
-- Include file structures and dependencies
+The **spec-to-plan** skill will:
+- Read the validated spec
+- Ask about tech stack preferences
+- Generate `plan.md` with architecture, data models, and implementation phases
+- Include code samples for types and APIs
 
 ### 4. Generate Tasks
 
-Break down the plan into actionable tasks:
-
-```bash
-/spec-kit:tasks
+```
+Generate tasks for the plan
 ```
 
-This will:
-- Parse your `plan.md`
-- Generate `tasks.md` with dependency-ordered tasks
-- Include acceptance criteria for each task
+The **plan-to-code** skill will:
+- Create `tasks.md` with dependency-ordered tasks
+- Embed all implementation details in each task
+- Mark parallelizable tasks with `[P]`
 
-### 5. Implement the Feature
+### 5. Implement
 
-Execute the tasks:
-
-```bash
-/spec-kit:implement
+```
+Implement the tasks
 ```
 
-This will:
-- Read `tasks.md`
-- Execute tasks in dependency order
-- Check off completed tasks
+Tasks are executed phase by phase, marked complete as they finish.
 
 ## Workflow
 
-The complete spec-driven development workflow:
-
 ```
-1. Constitution     → Define project governance principles
-2. Specify          → Write requirements and user stories
-3. Clarify          → Resolve ambiguities interactively
-4. Plan             → Design technical implementation
-5. Analyze          → Validate cross-artifact consistency
-6. Tasks            → Generate dependency-ordered task list
-7. Implement        → Execute tasks to build feature
-```
-
-### Optional Commands
-
-- **Clarify**: `/spec-kit:clarify` - Ask questions to resolve spec ambiguities
-- **Analyze**: `/spec-kit:analyze` - Read-only consistency validation across artifacts
-- **Constitution**: `/spec-kit:constitution` - Update project governance principles
-
-## Architecture
-
-This plugin uses a **TypeScript CLI** for robust git operations and artifact management, compiled to JavaScript and bundled with the plugin for zero-dependency execution.
-
-### Components
-
-```
-spec-kit/
-├── commands/                    # Slash commands (8 total)
-│   ├── init.md                  # Project setup
-│   ├── constitution.md          # Governance principles
-│   ├── specify.md               # Requirements definition
-│   ├── clarify.md               # Interactive ambiguity resolution
-│   ├── plan.md                  # Technical planning
-│   ├── tasks.md                 # Task generation
-│   ├── analyze.md               # Consistency validation
-│   └── implement.md             # Task execution
-├── templates/                   # Artifact templates
-│   ├── constitution-template.md
-│   ├── spec-template.md
-│   ├── plan-template.md
-│   ├── tasks-template.md
-│   └── checklist-template.md
-└── scripts/                     # TypeScript CLI (compiled to JS)
-    ├── src/                     # TypeScript source
-    │   ├── cli.ts               # CLI entry point
-    │   └── cli.test.ts          # Test suite
-    └── dist/                    # Compiled JavaScript (committed)
-        └── cli.js               # Single bundled file
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  spec-workflow  │────▶│  spec-to-plan   │────▶│  plan-to-code   │
+│                 │     │                 │     │                 │
+│  Create spec    │     │  Create plan    │     │  Generate tasks │
+│  Clarify        │     │  Refine         │     │  Refine         │
+│  Validate       │     │  Validate       │     │  Validate       │
+│                 │     │                 │     │  Implement      │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+        │                       │                       │
+        ▼                       ▼                       ▼
+    spec.md               plan.md                 tasks.md
+    (Ready for            (Ready for              (Ready to
+     Planning)             Tasks)                  Test)
 ```
 
-### CLI Usage
+## Skills
 
-The TypeScript CLI can be used standalone:
+### spec-workflow
 
-```bash
-# Initialize project
-node scripts/dist/cli.js init --plugin-root ${CLAUDE_PLUGIN_ROOT}
+Creates, refines, and validates feature specifications.
 
-# Create new feature (sequential numbering)
-node scripts/dist/cli.js create-feature user-auth --plugin-root ${CLAUDE_PLUGIN_ROOT}
+**Triggers:** "create a spec", "write a specification", "define requirements", "clarify the spec", "validate spec"
 
-# List existing features
-node scripts/dist/cli.js list-features --plugin-root ${CLAUDE_PLUGIN_ROOT}
+**Stages:**
+| Stage | Description |
+|-------|-------------|
+| Draft | Initial spec with potential `[NEEDS CLARIFICATION]` markers |
+| Waiting for Validation | All gaps resolved, ready for validation |
+| Ready for Planning | Validated, ready for spec-to-plan |
 
-# Load a template
-node scripts/dist/cli.js template spec-template --plugin-root ${CLAUDE_PLUGIN_ROOT}
+**Workflows:**
+- **Create**: Generate new spec from feature description
+- **Clarify**: Ask questions to resolve ambiguities
+- **Validate**: Run 6-point validation checklist
 
-# List artifacts for a feature
-node scripts/dist/cli.js artifacts .claude/spec-kit/specs/001-user-auth
+### spec-to-plan
 
-# Get current spec
-node scripts/dist/cli.js get-current-spec
+Transforms specifications into implementation plans.
 
-# Set current spec
-node scripts/dist/cli.js set-current-spec 001-user-auth
-```
+**Triggers:** "create a plan", "plan implementation", "define architecture", "refine the plan", "validate the plan"
 
-**Benefits:**
-- ✅ **Zero dependencies** for users — compiled JavaScript runs on Node.js
-- ✅ **Type safety** during development with TypeScript
-- ✅ **No shell escaping issues** — all logic in TypeScript
-- ✅ **Testable** — comprehensive test suite with Bun
-- ✅ **Fast** — ~20ms startup time
+**Stages:**
+| Stage | Description |
+|-------|-------------|
+| Draft | Initial plan with potential `[NEEDS DECISION]` markers |
+| Waiting for Validation | All decisions made, ready for validation |
+| Ready for Tasks | Validated, ready for plan-to-code |
+
+**Workflows:**
+- **Create**: Generate plan with architecture, data models, implementation phases
+- **Refine**: Resolve `[NEEDS DECISION]` markers
+- **Validate**: Check completeness, consistency, and clarity
+
+### plan-to-code
+
+Generates and executes actionable task lists from plans.
+
+**Triggers:** "create tasks", "generate tasks", "break down the plan", "validate tasks", "implement tasks"
+
+**Stages:**
+| Stage | Description |
+|-------|-------------|
+| Waiting for Validation | Task list created, may need refinement |
+| Ready for Implementation | Validated, ready for execution |
+| In Progress | Tasks being implemented |
+| Ready to Test | All phases completed |
+
+**Workflows:**
+- **Generate**: Create dependency-ordered tasks with embedded implementation details
+- **Refine**: Update tasks based on feedback
+- **Validate**: Check completeness, consistency, and executability
+- **Implement**: Execute tasks phase by phase
 
 ## Storage Structure
 
-When you use spec-kit, artifacts are organized as:
-
 ```
-.claude/spec-kit/
-├── memory/
-│   └── constitution.md          # Project governance principles
-└── specs/
-    ├── 001-user-authentication/ # Sequential feature directories
-    │   ├── spec.md              # Requirements and user stories
-    │   ├── plan.md              # Technical implementation plan
-    │   ├── tasks.md             # Actionable task list
-    │   └── checklists/          # Optional quality checklists
-    │       └── requirements.md
-    ├── 002-payment-integration/
-    │   ├── spec.md
-    │   ├── plan.md
-    │   └── tasks.md
-    └── 003-admin-dashboard/
-        ├── spec.md
-        └── plan.md
+specs/
+├── 001-user-authentication/
+│   ├── spec.md              # Requirements and user stories
+│   ├── plan.md              # Architecture and implementation phases
+│   └── tasks.md             # Dependency-ordered task list
+├── 002-payment-integration/
+│   ├── spec.md
+│   ├── plan.md
+│   └── tasks.md
+└── 003-admin-dashboard/
+    └── spec.md              # Can stop at any stage
 ```
 
-### Branch Naming Convention
+## Task Format
 
-Features are tracked using git branches:
-- **Pattern**: `spec-kit/{number}-{feature-name}`
-- **Examples**:
-  - `spec-kit/001-user-authentication`
-  - `spec-kit/002-payment-integration`
-  - `spec-kit/003-admin-dashboard`
+Tasks include all information needed for immediate execution:
 
-The CLI automatically:
-- Determines the next sequential number
-- Creates the feature directory
-- Creates and checks out the branch
+```markdown
+- [ ] [T005] [P] Create message model at `src/models/message.ts`
 
-## Commands Reference
+  ```typescript
+  interface Message {
+    id: string;
+    content: string;
+    senderId: string;
+    roomId: string;
+    createdAt: Date;
+  }
+  ```
 
-| Command                      | Model  | Description                               |
-| ---------------------------- | ------ | ----------------------------------------- |
-| `/spec-kit:init`             | Haiku  | Initialize project for spec-kit           |
-| `/spec-kit:constitution`     | Sonnet | Create/update governance principles       |
-| `/spec-kit:specify <name>`   | Opus   | Define requirements and user stories      |
-| `/spec-kit:clarify`          | Sonnet | Resolve specification ambiguities         |
-| `/spec-kit:plan`             | Opus   | Create technical implementation plan      |
-| `/spec-kit:tasks`            | Sonnet | Generate actionable task list             |
-| `/spec-kit:analyze`          | Sonnet | Validate cross-artifact consistency       |
-| `/spec-kit:implement`        | Sonnet | Execute tasks to build feature            |
+  - Include Zod schema for runtime validation
+  - Export both interface and Zod schema
+```
 
-### Command Details
+- `[T005]` - Sequential task ID
+- `[P]` - Parallelizable marker (optional)
+- Backtick paths - Exact file locations
+- Code blocks - Implementation details from plan
 
-#### /spec-kit:init
-- Interactive setup with project name and guiding principles
-- Creates directory structure
-- Generates constitution from template
-- **Model**: Haiku (simple setup task)
+## Quality Principles
 
-#### /spec-kit:constitution
-- Updates project governance principles
-- Validates consistency with existing specs
-- Can be run anytime to refine principles
-- **Model**: Sonnet (complex governance reasoning)
+### Specifications (spec-workflow)
+- Focus on WHAT users need and WHY
+- No implementation details (tech stack, APIs, code structure)
+- Mark unknowns with `[NEEDS CLARIFICATION: specific question]`
 
-#### /spec-kit:specify
-- Requires feature name argument
-- Creates sequential feature directory
-- Generates spec.md with requirements and user stories
-- Creates git branch automatically
-- **Model**: Opus (deep requirement analysis)
+### Plans (spec-to-plan)
+- Include code samples for types and APIs
+- Every decision includes rationale
+- Mark unknowns with `[NEEDS DECISION: specific question]`
 
-#### /spec-kit:clarify
-- Interactive Q&A session (max 5 questions)
-- Updates spec.md with clarifications
-- Must be run from within a feature directory
-- **Model**: Sonnet (interactive clarification)
+### Tasks (plan-to-code)
+- Every task includes exact file paths
+- Embed all implementation details from plan
+- Tasks executable without referring back to plan.md
 
-#### /spec-kit:plan
-- Reads spec.md and constitution.md
-- Generates plan.md with:
-  - Architectural decisions
-  - File structures
-  - Dependencies
-  - Data models
-  - API contracts
-- **Model**: Opus (architecture planning)
-
-#### /spec-kit:tasks
-- Reads plan.md
-- Generates tasks.md with:
-  - Dependency-ordered tasks
-  - Acceptance criteria
-  - Estimated complexity
-  - Prerequisites
-- **Model**: Sonnet (task decomposition)
-
-#### /spec-kit:analyze
-- **Read-only validation** (never modifies files)
-- Checks consistency across:
-  - Constitution ↔ spec.md
-  - spec.md ↔ plan.md
-  - plan.md ↔ tasks.md
-- Reports inconsistencies and gaps
-- **Model**: Sonnet (consistency analysis)
-
-#### /spec-kit:implement
-- Reads tasks.md
-- Executes tasks in dependency order
-- Checks off completed tasks
-- Can resume interrupted implementation
-- **Model**: Sonnet (implementation)
-
-## Templates
-
-All artifacts follow consistent templates:
-
-### constitution-template.md
-- Project vision and goals
-- Guiding principles
-- Technical standards
-- Decision-making guidelines
-
-### spec-template.md
-- Feature overview
-- User stories
-- Requirements (functional, non-functional, technical)
-- Success criteria
-- Out of scope
-
-### plan-template.md
-- Architecture overview
-- File structure
-- Dependencies
-- Data models
-- API contracts
-- Implementation phases
-
-### tasks-template.md
-- Phase-organized tasks
-- Acceptance criteria
-- Dependencies
-- Complexity estimates
-
-### checklist-template.md
-- Quality checkpoints
-- Testing requirements
-- Documentation needs
-- Review criteria
-
-## Feature Numbering
-
-Features are numbered sequentially:
-1. First feature: `001-feature-name`
-2. Second feature: `002-another-feature`
-3. Third feature: `003-yet-another`
-
-The CLI automatically:
-- Scans `.claude/spec-kit/specs/` for existing features
-- Determines the next available number
-- Creates the directory with correct padding
-
-## Best Practices
-
-### Constitution First
-Start every project with `/spec-kit:init` to establish governance principles. These guide all future specifications.
-
-### One Feature, One Branch
-Always create a new branch for each feature. This keeps work isolated and makes tracking easier.
-
-### Clarify Early
-Use `/spec-kit:clarify` after writing your spec to resolve ambiguities before planning. This saves rework.
-
-### Analyze Before Implementing
-Run `/spec-kit:analyze` after generating tasks to catch inconsistencies before writing code.
-
-### Sequential Workflow
-Follow the workflow order: constitution → specify → clarify → plan → analyze → tasks → implement
-
-### Regular Constitution Updates
-Update your constitution as you learn. Use `/spec-kit:constitution` to refine principles based on project evolution.
-
-## Files and Directories
+## Plugin Structure
 
 ```
 plugins/spec-kit/
-├── plugin.json                  # Plugin metadata
-├── README.md                    # This file
-├── commands/
-│   ├── init.md
-│   ├── constitution.md
-│   ├── specify.md
-│   ├── clarify.md
-│   ├── plan.md
-│   ├── tasks.md
-│   ├── analyze.md
-│   └── implement.md
-├── templates/
-│   ├── constitution-template.md
-│   ├── spec-template.md
-│   ├── plan-template.md
-│   ├── tasks-template.md
-│   └── checklist-template.md
-└── scripts/
-    ├── src/
-    │   ├── cli.ts               # TypeScript CLI
-    │   └── cli.test.ts          # Test suite
-    ├── dist/
-    │   └── cli.js               # Compiled JavaScript
-    ├── package.json
-    └── tsconfig.json
-
-.claude/                         # Your project (not in plugin)
-└── spec-kit/
-    ├── memory/
-    │   └── constitution.md      # Your project principles
-    └── specs/
-        ├── 001-feature-name/
-        │   ├── spec.md
-        │   ├── plan.md
-        │   ├── tasks.md
-        │   └── checklists/
-        ├── 002-another-feature/
-        │   ├── spec.md
-        │   └── plan.md
-        └── 003-yet-another/
-            └── spec.md
+├── plugin.json
+├── README.md
+└── skills/
+    ├── spec-workflow/
+    │   ├── SKILL.md
+    │   └── assets/
+    │       └── spec-template.md
+    ├── spec-to-plan/
+    │   ├── SKILL.md
+    │   └── assets/
+    │       └── plan-template.md
+    └── plan-to-code/
+        ├── SKILL.md
+        ├── assets/
+        │   └── tasks-template.md
+        └── workflows/
+            ├── implement-tasks.md
+            ├── refine-tasks.md
+            └── validate-tasks.md
 ```
-
-## Contributing
-
-### For Users
-
-To improve this plugin:
-1. Commands are in `plugins/spec-kit/commands/`
-2. Templates are in `plugins/spec-kit/templates/`
-3. Follow existing patterns for consistency
-4. Test with various feature scenarios
-
-### For Developers
-
-The plugin uses a TypeScript CLI for git operations. To contribute:
-
-#### Setup
-
-```bash
-cd plugins/spec-kit/scripts
-
-# Install Bun (one-time)
-curl -fsSL https://bun.sh/install | bash
-
-# Install dependencies
-bun install
-```
-
-#### Development Workflow
-
-```bash
-# Make changes to src/
-
-# Run tests
-bun test
-
-# Type check
-bun run typecheck
-
-# Build to dist/
-bun run build
-
-# Test CLI locally
-node dist/cli.js init --plugin-root ${CLAUDE_PLUGIN_ROOT}
-```
-
-#### Before Committing
-
-```bash
-# Ensure tests pass
-bun test
-
-# Ensure dist/ is up to date
-bun run build
-
-# Commit both src/ and dist/
-git add src/ dist/
-git commit -m "feat: your change"
-```
-
-**Important:** Always commit the compiled `dist/` folder. Users run the JavaScript, not TypeScript.
 
 ## License
 
 MIT
-
-## Resources
-
-- [GitHub's spec-kit](https://github.com/github/spec-kit) - Original inspiration
-- [Claude Code Documentation](https://code.claude.com/docs)
-- [Plugin Marketplaces Documentation](https://code.claude.com/docs/en/plugin-marketplaces)
