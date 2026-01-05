@@ -37,10 +37,6 @@
         "typescript": "^5.9.3",
       },
     },
-    "plugins/code-review-tools/scripts": {
-      "name": "@plugins/code-review-cli",
-      "version": "1.0.0",
-    },
     "plugins/spec-kit/scripts": {
       "name": "@plugins/spec-kit-cli",
       "version": "1.0.0",
@@ -76,8 +72,6 @@
     "@oxlint/win32-arm64": ["@oxlint/win32-arm64@0.16.12", "", { "os": "win32", "cpu": "arm64" }, "sha512-wcxq3IBJ7ZlONlXJxQM+7EMx+LX1nkz3ZS3R0EtDM76EOZaqe8BMkW5cXVhF8jarZTZC18oKAckW4Ng9d8adBg=="],
 
     "@oxlint/win32-x64": ["@oxlint/win32-x64@0.16.12", "", { "os": "win32", "cpu": "x64" }, "sha512-Ae1fx7wmAcMVqzS8rLINaFRpAdh29QzHh133bEYMHzfWBYyK/hLu9g4GLwC/lEIVQu9884b8qutGfdOk6Qia3w=="],
-
-    "@plugins/code-review-cli": ["@plugins/code-review-cli@workspace:plugins/code-review-tools/scripts"],
 
     "@plugins/spec-kit-cli": ["@plugins/spec-kit-cli@workspace:plugins/spec-kit/scripts"],
 

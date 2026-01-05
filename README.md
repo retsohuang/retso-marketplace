@@ -28,6 +28,41 @@ Users can add this marketplace to their Claude Code installation using one of th
 /plugin marketplace add https://github.com/retsohuang/retso-marketplace.git
 ```
 
+## CLI Tool (Manual Installation)
+
+For manual plugin installation without the marketplace system, use **plugin-kit** - an interactive terminal UI.
+
+### Installing the CLI
+
+```bash
+./cli/install.sh
+```
+
+This installs the `plugin-kit` binary to `~/.local/bin/` with a `pk` shorthand alias.
+
+### Using the CLI
+
+```bash
+plugin-kit   # or just: pk
+```
+
+The interactive wizard guides you through:
+
+1. **Plugin Selection** - Search and select plugins using arrow keys and spacebar
+2. **Installation Location** - Choose `./.claude` (project-local) or a custom path
+3. **Conflict Resolution** - Handle existing plugins (override or skip)
+4. **Installation** - Plugins are extracted with their commands, agents, and skills
+
+### Keyboard Controls
+
+| Key | Action |
+|-----|--------|
+| `↑↓` | Navigate |
+| `Space` | Toggle selection |
+| `Enter` | Confirm |
+| `Esc` | Exit/Back |
+| Type | Search plugins |
+
 ## Using Plugins
 
 Once the marketplace is added, install plugins with:
@@ -134,11 +169,13 @@ The marketplace is configured in `.claude-plugin/marketplace.json`. Key fields:
 
 ## Available Plugins
 
-| Plugin Name                                                | Description                                                                                                                                                   | Version |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| [code-review-tools](./plugins/code-review-tools/README.md) | Review code changes commit-by-commit with custom rules support. Includes interactive setup and rule creation.                                                 | 2.1.1   |
-| [github-tools](./plugins/github-tools/README.md)           | GitHub workflow tools for daily development. Analyze PR review comments and categorize what needs fixing.                                                     | 0.1.1   |
-| [spec-kit](./plugins/spec-kit/README.md)                   | Spec-Driven Development toolkit for Claude Code. Create specifications, plans, and tasks following a structured workflow from requirements to implementation. | 0.1.0   |
+| Plugin Name                                                | Description                                                                                                                                                   | Version | Install    |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ---------- |
+| [code-review-tools](./plugins/code-review-tools/README.md) | Review code changes commit-by-commit with custom rules support. Includes interactive setup and rule creation.                                                 | 2.1.1   | Manual ¹   |
+| [github-tools](./plugins/github-tools/README.md)           | GitHub workflow tools for daily development. Analyze PR review comments and categorize what needs fixing.                                                     | 0.1.1   | Either     |
+| [spec-kit](./plugins/spec-kit/README.md)                   | Spec-Driven Development toolkit for Claude Code. Create specifications, plans, and tasks following a structured workflow from requirements to implementation. | 0.1.0   | Marketplace |
+
+¹ **Manual installation recommended** - Supports custom review rules in the `references/` directory, which requires local file access not available via marketplace installation.
 
 ## Contributing
 

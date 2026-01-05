@@ -7,12 +7,14 @@ When changes involve extracting shared components, verify the following:
 **What to check**: All sub-components included in the extracted component were present in ALL original implementations.
 
 **How to verify**:
+
 ```bash
 # View original file before extraction
 git show <commit-hash>^:<file-path>
 ```
 
 **Example issue**:
+
 ```tsx
 // Extracted component includes PlatformMetricsSummary
 <PlatformMetricsSummary platform={platform} metrics={metrics} />
@@ -30,6 +32,7 @@ git show <commit-hash>^:<file-path>
 **What to check**: Blocks like `{condition && <Component />}` were present in ALL original files.
 
 **Example pattern**:
+
 ```tsx
 {statisticPlatformSupport.metricPerformance.includes(platform.shortcode) && (
   <PlatformMetricsSummary ... />
@@ -37,6 +40,7 @@ git show <commit-hash>^:<file-path>
 ```
 
 **How to verify**:
+
 - Check each original file before extraction
 - Confirm the exact same condition existed in each file
 - If conditions differed, flag as an issue
@@ -50,12 +54,14 @@ git show <commit-hash>^:<file-path>
 **What to check**: Page-specific differences are handled via props or configuration flags, not assumptions.
 
 **Good pattern**:
+
 ```tsx
 // Component accepts prop to control visibility
 <OverviewSection showMetricsSummary={true} />
 ```
 
 **Bad pattern**:
+
 ```tsx
 // Component assumes all pages need this feature
 <OverviewSection /> // Always shows metrics summary
@@ -69,34 +75,32 @@ git show <commit-hash>^:<file-path>
 
 When flagging component extraction issues:
 
-```markdown
+````markdown
 **Line X-Y:**
+
 ```tsx
-{/* problematic code */}
+{
+  /* problematic code */
+}
 ```
+````
+
 > **⚠️ Component Extraction Issue**: [Brief description of what's wrong]. [Suggestion to fix it].
-```
+
+````
 
 ## Examples
 
-### Example 1: Missing Component in Original
-
-```markdown
-**Line 89-92:**
-```tsx
-{statisticPlatformSupport.metricPerformance.includes(platform.shortcode) && (
-  <PlatformMetricsSummary platform={platform} metrics={metrics} />
-)}
-```
-> **⚠️ Component Extraction Issue**: Verify that ALL pages using this component originally had `PlatformMetricsSummary`. Check `pages/kol/self/[kolId].tsx` - if it didn't have this component before, you need to add a prop to control its visibility (e.g., `showMetricsSummary`).
-```
-
-### Example 2: Different Conditions in Originals
+### Example 1: Different Conditions in Originals
 
 ```markdown
 **Line 45:**
 ```tsx
 {platform.hasAnalytics && <AnalyticsPanel />}
-```
+````
+
 > **⚠️ Component Extraction Issue**: Original files had different conditions. Page A checked `platform.hasAnalytics`, Page B checked `user.canViewAnalytics`. Add both conditions or a configuration prop.
+
+```
+
 ```
