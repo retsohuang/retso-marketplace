@@ -13,7 +13,7 @@ Creates structured implementation plans from feature specifications. Based on sp
 
 ## Prerequisites
 
-This skill requires an existing feature specification file (`spec.md`) with status `Ready for Planning`. The spec must be created by the `spec-workflow` skill and have all clarifications resolved before planning can begin.
+This skill requires an existing feature specification file (`spec.md`) with status `Ready for Planning`. The spec must be created by the `create-spec` skill and have all clarifications resolved before planning can begin.
 
 ## Stages
 
@@ -81,7 +81,7 @@ Use when the user provides a spec file path and wants to create an implementatio
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────────┐  │
 │  │  spec.md        │  │  Tech Stack     │  │  Constraints        │  │
 │  │  (from          │  │  Preferences    │  │  & Requirements     │  │
-│  │  /spec-workflow)│  │                 │  │                     │  │
+│  │  /create-spec) │  │                 │  │                     │  │
 │  └────────┬────────┘  └────────┬────────┘  └──────────┬──────────┘  │
 └───────────┼────────────────────┼─────────────────────┼──────────────┘
             │                    │                     │
@@ -362,5 +362,5 @@ See [plan-template.md](assets/plan-template.md) for the complete plan structure 
 
 ## Relationship to Other Skills
 
-- **spec-workflow** (before): Creates the spec this skill uses as input
+- **create-spec** (before): Creates the spec this skill uses as input
 - **plan-to-code** (after): Uses validated plan to generate implementation

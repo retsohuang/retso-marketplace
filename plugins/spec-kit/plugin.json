@@ -15,8 +15,13 @@
     "workflow",
     "development"
   ],
+  "commands": [
+    "./commands/create-spec.md",
+    "./commands/clarify-spec.md",
+    "./commands/validate-spec.md"
+  ],
   "skills": [
-    "./skills/spec-workflow",
+    "./skills/create-spec",
     "./skills/spec-to-plan",
     "./skills/plan-to-code"
   ]

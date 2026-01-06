@@ -8,7 +8,7 @@ This plugin brings spec-driven development methodology to Claude Code, enabling 
 
 **Key Features:**
 
-- **Three-skill workflow**: spec-workflow → spec-to-plan → plan-to-code
+- **Three-skill workflow**: create-spec → spec-to-plan → plan-to-code
 - **Stage progression**: Each artifact progresses through stages (Draft → Waiting for Validation → Ready)
 - **Embedded implementation details**: Tasks include all code samples and patterns for immediate execution
 - **Parallelization markers**: Tasks marked with `[P]` can run simultaneously
@@ -23,20 +23,28 @@ Ask Claude to create a spec for your feature:
 Create a spec for user authentication with email/password login
 ```
 
-The **spec-workflow** skill will:
+The **create-spec** skill will:
 - Create `specs/001-user-authentication/spec.md`
 - Focus on WHAT users need and WHY (not HOW)
 - Mark unknowns with `[NEEDS CLARIFICATION]` markers
 
-### 2. Clarify and Validate the Spec
+### 2. Clarify the Spec
 
+```bash
+/spec-kit:clarify-spec specs/001-user-authentication
 ```
-Clarify the spec
+
+Resolves `[NEEDS CLARIFICATION]` markers by asking questions.
+
+### 3. Validate the Spec
+
+```bash
+/spec-kit:validate-spec specs/001-user-authentication
 ```
 
-The skill will ask questions to resolve ambiguities, then validate readiness for planning.
+Runs a 6-point validation checklist to ensure the spec is ready for planning.
 
-### 3. Create an Implementation Plan
+### 4. Create an Implementation Plan
 
 ```
 Create a plan for the user-authentication spec
@@ -48,7 +56,7 @@ The **spec-to-plan** skill will:
 - Generate `plan.md` with architecture, data models, and implementation phases
 - Include code samples for types and APIs
 
-### 4. Generate Tasks
+### 5. Generate Tasks
 
 ```
 Generate tasks for the plan
@@ -59,7 +67,7 @@ The **plan-to-code** skill will:
 - Embed all implementation details in each task
 - Mark parallelizable tasks with `[P]`
 
-### 5. Implement
+### 6. Implement
 
 ```
 Implement the tasks
@@ -71,12 +79,13 @@ Tasks are executed phase by phase, marked complete as they finish.
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  spec-workflow  │────▶│  spec-to-plan   │────▶│  plan-to-code   │
+│   create-spec   │────▶│  spec-to-plan   │────▶│  plan-to-code   │
 │                 │     │                 │     │                 │
 │  Create spec    │     │  Create plan    │     │  Generate tasks │
-│  Clarify        │     │  Refine         │     │  Refine         │
-│  Validate       │     │  Validate       │     │  Validate       │
-│                 │     │                 │     │  Implement      │
+│                 │     │  Refine         │     │  Refine         │
+│ /spec-kit:      │     │  Validate       │     │  Validate       │
+│   clarify       │     │                 │     │  Implement      │
+│   validate      │     │                 │     │                 │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
         │                       │                       │
         ▼                       ▼                       ▼
@@ -87,23 +96,31 @@ Tasks are executed phase by phase, marked complete as they finish.
 
 ## Skills
 
-### spec-workflow
+### create-spec
 
-Creates, refines, and validates feature specifications.
+Creates feature specifications from user descriptions.
 
-**Triggers:** "create a spec", "write a specification", "define requirements", "clarify the spec", "validate spec"
+**Triggers:** "create a spec", "write a specification", "define requirements"
 
 **Stages:**
-| Stage | Description |
-|-------|-------------|
-| Draft | Initial spec with potential `[NEEDS CLARIFICATION]` markers |
-| Waiting for Validation | All gaps resolved, ready for validation |
-| Ready for Planning | Validated, ready for spec-to-plan |
 
-**Workflows:**
-- **Create**: Generate new spec from feature description
-- **Clarify**: Ask questions to resolve ambiguities
-- **Validate**: Run 6-point validation checklist
+```
+┌─────────────┐      ┌───────────────────────┐      ┌─────────────────────┐
+│   Draft     │─────▶│  Waiting for          │─────▶│  Ready for Planning │
+│             │      │  Validation           │      │                     │
+└─────────────┘      └───────────────────────┘      └─────────────────────┘
+      │                        │                              │
+      ▼                        ▼                              ▼
+  Initial spec           All clarifications             Validation passed,
+  creation,              resolved, all                  ready for spec-to-plan
+  may have gaps          sections complete
+```
+
+| Stage | Description | Next Action |
+|-------|-------------|-------------|
+| Draft | Initial spec with `[NEEDS CLARIFICATION]` markers | `/spec-kit:clarify-spec` |
+| Waiting for Validation | All gaps resolved, ready for validation | `/spec-kit:validate-spec` |
+| Ready for Planning | Validated, ready for spec-to-plan | spec-to-plan skill |
 
 ### spec-to-plan
 
@@ -142,6 +159,32 @@ Generates and executes actionable task lists from plans.
 - **Refine**: Update tasks based on feedback
 - **Validate**: Check completeness, consistency, and executability
 - **Implement**: Execute tasks phase by phase
+
+## Commands
+
+### /spec-kit:create-spec
+
+Create a new feature specification from a description.
+
+```bash
+/spec-kit:create-spec user authentication with email/password login
+```
+
+### /spec-kit:clarify-spec
+
+Refine an existing spec by resolving gaps and clarifying requirements.
+
+```bash
+/spec-kit:clarify-spec specs/001-feature-name
+```
+
+### /spec-kit:validate-spec
+
+Validate a spec before marking it ready for planning. Runs a 6-point checklist.
+
+```bash
+/spec-kit:validate-spec specs/001-feature-name
+```
 
 ## Storage Structure
 
@@ -187,7 +230,7 @@ Tasks include all information needed for immediate execution:
 
 ## Quality Principles
 
-### Specifications (spec-workflow)
+### Specifications (create-spec)
 - Focus on WHAT users need and WHY
 - No implementation details (tech stack, APIs, code structure)
 - Mark unknowns with `[NEEDS CLARIFICATION: specific question]`
@@ -208,8 +251,12 @@ Tasks include all information needed for immediate execution:
 plugins/spec-kit/
 ├── plugin.json
 ├── README.md
+├── commands/
+│   ├── create-spec.md
+│   ├── clarify-spec.md
+│   └── validate-spec.md
 └── skills/
-    ├── spec-workflow/
+    ├── create-spec/
     │   ├── SKILL.md
     │   └── assets/
     │       └── spec-template.md
