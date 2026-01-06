@@ -8,7 +8,7 @@ This plugin brings spec-driven development methodology to Claude Code, enabling 
 
 **Key Features:**
 
-- **Three-skill workflow**: create-spec → spec-to-plan → plan-to-code
+- **Three-skill workflow**: create-spec → draft-plan → plan-to-code
 - **Stage progression**: Each artifact progresses through stages (Draft → Waiting for Validation → Ready)
 - **Embedded implementation details**: Tasks include all code samples and patterns for immediate execution
 - **Parallelization markers**: Tasks marked with `[P]` can run simultaneously
@@ -50,13 +50,22 @@ Runs a 6-point validation checklist to ensure the spec is ready for planning.
 Create a plan for the user-authentication spec
 ```
 
-The **spec-to-plan** skill will:
+The **draft-plan** skill will:
 - Read the validated spec
 - Ask about tech stack preferences
 - Generate `plan.md` with architecture, data models, and implementation phases
 - Include code samples for types and APIs
 
-### 5. Generate Tasks
+### 5. Refine and Validate Plan
+
+```bash
+/spec-kit:refine-plan specs/001-user-authentication
+/spec-kit:validate-plan specs/001-user-authentication
+```
+
+Refine resolves `[NEEDS DECISION]` markers, validate ensures the plan is ready for tasks.
+
+### 6. Generate Tasks
 
 ```
 Generate tasks for the plan
@@ -67,7 +76,7 @@ The **plan-to-code** skill will:
 - Embed all implementation details in each task
 - Mark parallelizable tasks with `[P]`
 
-### 6. Implement
+### 7. Implement
 
 ```
 Implement the tasks
@@ -79,13 +88,13 @@ Tasks are executed phase by phase, marked complete as they finish.
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   create-spec   │────▶│  spec-to-plan   │────▶│  plan-to-code   │
+│   create-spec   │────▶│   draft-plan    │────▶│  plan-to-code   │
 │                 │     │                 │     │                 │
 │  Create spec    │     │  Create plan    │     │  Generate tasks │
-│                 │     │  Refine         │     │  Refine         │
-│ /spec-kit:      │     │  Validate       │     │  Validate       │
-│   clarify       │     │                 │     │  Implement      │
-│   validate      │     │                 │     │                 │
+│                 │     │                 │     │  Refine         │
+│ /spec-kit:      │     │ /spec-kit:      │     │  Validate       │
+│   clarify       │     │   refine-plan   │     │  Implement      │
+│   validate      │     │   validate-plan │     │                 │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
         │                       │                       │
         ▼                       ▼                       ▼
@@ -120,25 +129,23 @@ Creates feature specifications from user descriptions.
 |-------|-------------|-------------|
 | Draft | Initial spec with `[NEEDS CLARIFICATION]` markers | `/spec-kit:clarify-spec` |
 | Waiting for Validation | All gaps resolved, ready for validation | `/spec-kit:validate-spec` |
-| Ready for Planning | Validated, ready for spec-to-plan | spec-to-plan skill |
+| Ready for Planning | Validated, ready for draft-plan | draft-plan skill |
 
-### spec-to-plan
+### draft-plan
 
 Transforms specifications into implementation plans.
 
-**Triggers:** "create a plan", "plan implementation", "define architecture", "refine the plan", "validate the plan"
+**Triggers:** "create a plan", "plan implementation", "define architecture"
 
 **Stages:**
-| Stage | Description |
-|-------|-------------|
-| Draft | Initial plan with potential `[NEEDS DECISION]` markers |
-| Waiting for Validation | All decisions made, ready for validation |
-| Ready for Tasks | Validated, ready for plan-to-code |
+| Stage | Description | Next Action |
+|-------|-------------|-------------|
+| Draft | Initial plan with potential `[NEEDS DECISION]` markers | `/spec-kit:refine-plan` |
+| Waiting for Validation | All decisions made, ready for validation | `/spec-kit:validate-plan` |
+| Ready for Tasks | Validated, ready for plan-to-code | plan-to-code skill |
 
-**Workflows:**
+**Workflow:**
 - **Create**: Generate plan with architecture, data models, implementation phases
-- **Refine**: Resolve `[NEEDS DECISION]` markers
-- **Validate**: Check completeness, consistency, and clarity
 
 ### plan-to-code
 
@@ -184,6 +191,22 @@ Validate a spec before marking it ready for planning. Runs a 6-point checklist.
 
 ```bash
 /spec-kit:validate-spec specs/001-feature-name
+```
+
+### /spec-kit:refine-plan
+
+Refine an existing plan by resolving `[NEEDS DECISION]` markers and completing gaps.
+
+```bash
+/spec-kit:refine-plan specs/001-feature-name
+```
+
+### /spec-kit:validate-plan
+
+Validate a plan before marking it ready for tasks. Runs completeness, consistency, and clarity checks.
+
+```bash
+/spec-kit:validate-plan specs/001-feature-name
 ```
 
 ## Storage Structure
@@ -254,13 +277,15 @@ plugins/spec-kit/
 ├── commands/
 │   ├── create-spec.md
 │   ├── clarify-spec.md
-│   └── validate-spec.md
+│   ├── validate-spec.md
+│   ├── refine-plan.md
+│   └── validate-plan.md
 └── skills/
     ├── create-spec/
     │   ├── SKILL.md
     │   └── assets/
     │       └── spec-template.md
-    ├── spec-to-plan/
+    ├── draft-plan/
     │   ├── SKILL.md
     │   └── assets/
     │       └── plan-template.md

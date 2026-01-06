@@ -18,11 +18,13 @@
   "commands": [
     "./commands/create-spec.md",
     "./commands/clarify-spec.md",
-    "./commands/validate-spec.md"
+    "./commands/validate-spec.md",
+    "./commands/refine-plan.md",
+    "./commands/validate-plan.md"
   ],
   "skills": [
     "./skills/create-spec",
-    "./skills/spec-to-plan",
+    "./skills/draft-plan",
     "./skills/plan-to-code"
   ]
 }

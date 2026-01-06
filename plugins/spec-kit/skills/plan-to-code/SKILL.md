@@ -368,5 +368,5 @@ See [tasks-template.md](assets/tasks-template.md) for the complete task list str
 
 ## Relationship to Other Skills
 
-- **spec-to-plan** (before): Creates and validates the plan this skill uses as input
+- **draft-plan** (before): Creates the plan this skill uses as input
 - **Testing** (after): Tests the implemented code after reaching Ready to Test stage
