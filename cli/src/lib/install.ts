@@ -10,6 +10,14 @@ import type {
 import { PluginManifestSchema } from '../types/plugin'
 import { transformPlugin } from './transform'
 
+export interface InstallFsLike {
+  access: (path: string) => Promise<void>
+}
+
+const defaultFs: InstallFsLike = {
+  access,
+}
+
 async function commandExists(cmd: string): Promise<boolean> {
   try {
     const proc = Bun.spawn(['which', cmd], { stdout: 'pipe', stderr: 'pipe' })
@@ -60,6 +68,7 @@ export function expandPath(path: string): string {
 export async function checkExistingPlugins(
   plugins: PluginWithContent[],
   targetDir: string,
+  fs: InstallFsLike = defaultFs,
 ): Promise<ExistingPlugin[]> {
   const expandedDir = expandPath(targetDir)
   const existing: ExistingPlugin[] = []
@@ -68,7 +77,7 @@ export async function checkExistingPlugins(
     // Check if commands namespace exists
     const commandsPath = join(expandedDir, 'commands', plugin.name)
     try {
-      await access(commandsPath)
+      await fs.access(commandsPath)
       existing.push({
         plugin: { name: plugin.name, description: plugin.description },
         path: commandsPath,

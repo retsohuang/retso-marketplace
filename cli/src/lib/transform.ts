@@ -2,11 +2,25 @@ import { readdir, stat } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import type { PluginManifest, TransformResult } from '../types/plugin'
 
+export interface TransformFsLike {
+  stat: (path: string) => Promise<{ isDirectory: () => boolean }>
+  readdir: (
+    path: string,
+    options: { withFileTypes: true },
+  ) => Promise<{ name: string; isDirectory: () => boolean }[]>
+}
+
+const defaultFs: TransformFsLike = {
+  stat,
+  readdir: readdir as TransformFsLike['readdir'],
+}
+
 export async function transformPlugin(
   pluginName: string,
   manifest: PluginManifest,
   pluginPath: string,
   targetDir: string,
+  fs: TransformFsLike = defaultFs,
 ): Promise<TransformResult> {
   const result: TransformResult = {
     commands: [],
@@ -41,9 +55,9 @@ export async function transformPlugin(
   // Transform skills: keep directory structure
   const skillsDir = join(pluginPath, 'skills')
   try {
-    const skillsStat = await stat(skillsDir)
+    const skillsStat = await fs.stat(skillsDir)
     if (skillsStat.isDirectory()) {
-      const entries = await readdir(skillsDir, { withFileTypes: true })
+      const entries = await fs.readdir(skillsDir, { withFileTypes: true })
       for (const entry of entries) {
         if (entry.isDirectory()) {
           result.skills.push({
