@@ -65,6 +65,20 @@ export function expandPath(path: string): string {
   return path
 }
 
+export async function shouldRemoveExistingPath(
+  path: string,
+  override: boolean,
+  fs: InstallFsLike = defaultFs,
+): Promise<boolean> {
+  if (!override) return false
+  try {
+    await fs.access(path)
+    return true
+  } catch {
+    return false
+  }
+}
+
 export async function checkExistingPlugins(
   plugins: PluginWithContent[],
   targetDir: string,
@@ -208,6 +222,9 @@ export async function installPlugins(
 
         // Copy skills (keep structure)
         for (const { source, target } of transform.skills) {
+          if (await shouldRemoveExistingPath(target, options?.override ?? false)) {
+            await moveToTrash(target)
+          }
           await mkdir(dirname(target), { recursive: true })
           await copyDirectory(source, target)
           installed.skills.push(target)

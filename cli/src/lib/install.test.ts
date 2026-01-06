@@ -3,6 +3,7 @@ import { Volume, createFsFromVolume } from 'memfs'
 import {
   checkExistingPlugins,
   expandPath,
+  shouldRemoveExistingPath,
   type InstallFsLike,
 } from './install'
 import type { PluginWithContent } from '../types/plugin'
@@ -206,5 +207,51 @@ describe('checkExistingPlugins', () => {
     const result = await checkExistingPlugins(plugins, TARGET_DIR, fs)
 
     expect(result).toHaveLength(0)
+  })
+})
+
+describe('shouldRemoveExistingPath', () => {
+  test('returns true when override is true and path exists', async () => {
+    vol.mkdirSync(`${TARGET_DIR}/skills/my-skill`, { recursive: true })
+
+    const result = await shouldRemoveExistingPath(
+      `${TARGET_DIR}/skills/my-skill`,
+      true,
+      fs,
+    )
+
+    expect(result).toBe(true)
+  })
+
+  test('returns false when override is true but path does not exist', async () => {
+    const result = await shouldRemoveExistingPath(
+      `${TARGET_DIR}/skills/nonexistent`,
+      true,
+      fs,
+    )
+
+    expect(result).toBe(false)
+  })
+
+  test('returns false when override is false even if path exists', async () => {
+    vol.mkdirSync(`${TARGET_DIR}/skills/my-skill`, { recursive: true })
+
+    const result = await shouldRemoveExistingPath(
+      `${TARGET_DIR}/skills/my-skill`,
+      false,
+      fs,
+    )
+
+    expect(result).toBe(false)
+  })
+
+  test('returns false when override is false and path does not exist', async () => {
+    const result = await shouldRemoveExistingPath(
+      `${TARGET_DIR}/skills/nonexistent`,
+      false,
+      fs,
+    )
+
+    expect(result).toBe(false)
   })
 })
