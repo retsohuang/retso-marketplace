@@ -8,7 +8,7 @@ This plugin brings spec-driven development methodology to Claude Code, enabling 
 
 **Key Features:**
 
-- **Three-skill workflow**: create-spec → draft-plan → plan-to-code
+- **Three-skill workflow**: create-spec → draft-plan → generate-tasks
 - **Stage progression**: Each artifact progresses through stages (Draft → Waiting for Validation → Ready)
 - **Embedded implementation details**: Tasks include all code samples and patterns for immediate execution
 - **Parallelization markers**: Tasks marked with `[P]` can run simultaneously
@@ -71,30 +71,40 @@ Refine resolves `[NEEDS DECISION]` markers, validate ensures the plan is ready f
 Generate tasks for the plan
 ```
 
-The **plan-to-code** skill will:
+The **generate-tasks** skill will:
 - Create `tasks.md` with dependency-ordered tasks
 - Embed all implementation details in each task
 - Mark parallelizable tasks with `[P]`
 
-### 7. Implement
+### 7. Refine and Validate Tasks
 
-```
-Implement the tasks
+```bash
+/spec-kit:refine-tasks specs/001-user-authentication
+/spec-kit:validate-tasks specs/001-user-authentication
 ```
 
-Tasks are executed phase by phase, marked complete as they finish.
+Refine updates task details, validate ensures tasks are ready for implementation.
+
+### 8. Implement
+
+```bash
+/spec-kit:implement-tasks specs/001-user-authentication
+```
+
+Executes tasks phase by phase, marking each complete as it finishes.
 
 ## Workflow
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   create-spec   │────▶│   draft-plan    │────▶│  plan-to-code   │
+│   create-spec   │────▶│   draft-plan    │────▶│ generate-tasks  │
 │                 │     │                 │     │                 │
 │  Create spec    │     │  Create plan    │     │  Generate tasks │
-│                 │     │                 │     │  Refine         │
-│ /spec-kit:      │     │ /spec-kit:      │     │  Validate       │
-│   clarify       │     │   refine-plan   │     │  Implement      │
-│   validate      │     │   validate-plan │     │                 │
+│                 │     │                 │     │                 │
+│ /spec-kit:      │     │ /spec-kit:      │     │ /spec-kit:      │
+│   clarify       │     │   refine-plan   │     │   refine-tasks  │
+│   validate      │     │   validate-plan │     │   validate-tasks│
+│                 │     │                 │     │   implement     │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
         │                       │                       │
         ▼                       ▼                       ▼
@@ -121,7 +131,7 @@ Creates feature specifications from user descriptions.
       │                        │                              │
       ▼                        ▼                              ▼
   Initial spec           All clarifications             Validation passed,
-  creation,              resolved, all                  ready for spec-to-plan
+  creation,              resolved, all                  ready for draft-plan
   may have gaps          sections complete
 ```
 
@@ -142,30 +152,27 @@ Transforms specifications into implementation plans.
 |-------|-------------|-------------|
 | Draft | Initial plan with potential `[NEEDS DECISION]` markers | `/spec-kit:refine-plan` |
 | Waiting for Validation | All decisions made, ready for validation | `/spec-kit:validate-plan` |
-| Ready for Tasks | Validated, ready for plan-to-code | plan-to-code skill |
+| Ready for Tasks | Validated, ready for generate-tasks | generate-tasks skill |
 
 **Workflow:**
 - **Create**: Generate plan with architecture, data models, implementation phases
 
-### plan-to-code
+### generate-tasks
 
-Generates and executes actionable task lists from plans.
+Generates actionable task lists from plans.
 
-**Triggers:** "create tasks", "generate tasks", "break down the plan", "validate tasks", "implement tasks"
+**Triggers:** "create tasks", "generate tasks", "break down the plan"
 
 **Stages:**
-| Stage | Description |
-|-------|-------------|
-| Waiting for Validation | Task list created, may need refinement |
-| Ready for Implementation | Validated, ready for execution |
-| In Progress | Tasks being implemented |
-| Ready to Test | All phases completed |
+| Stage | Description | Next Action |
+|-------|-------------|-------------|
+| Waiting for Validation | Task list created, may need refinement | `/spec-kit:refine-tasks` or `/spec-kit:validate-tasks` |
+| Ready for Implementation | Validated, ready for execution | `/spec-kit:implement-tasks` |
+| In Progress | Tasks being implemented | `/spec-kit:implement-tasks` |
+| Ready to Test | All phases completed | Hand off to testing |
 
-**Workflows:**
+**Workflow:**
 - **Generate**: Create dependency-ordered tasks with embedded implementation details
-- **Refine**: Update tasks based on feedback
-- **Validate**: Check completeness, consistency, and executability
-- **Implement**: Execute tasks phase by phase
 
 ## Commands
 
@@ -207,6 +214,31 @@ Validate a plan before marking it ready for tasks. Runs completeness, consistenc
 
 ```bash
 /spec-kit:validate-plan specs/001-feature-name
+```
+
+### /spec-kit:refine-tasks
+
+Refine existing tasks by updating details based on user feedback.
+
+```bash
+/spec-kit:refine-tasks specs/001-feature-name
+```
+
+### /spec-kit:validate-tasks
+
+Validate tasks before marking them ready for implementation. Runs completeness, consistency, and executability checks.
+
+```bash
+/spec-kit:validate-tasks specs/001-feature-name
+```
+
+### /spec-kit:implement-tasks
+
+Execute tasks from a validated task list, implementing code phase by phase.
+
+```bash
+/spec-kit:implement-tasks specs/001-feature-name
+/spec-kit:implement-tasks specs/001-feature-name 2-3
 ```
 
 ## Storage Structure
@@ -258,12 +290,12 @@ Tasks include all information needed for immediate execution:
 - No implementation details (tech stack, APIs, code structure)
 - Mark unknowns with `[NEEDS CLARIFICATION: specific question]`
 
-### Plans (spec-to-plan)
+### Plans (draft-plan)
 - Include code samples for types and APIs
 - Every decision includes rationale
 - Mark unknowns with `[NEEDS DECISION: specific question]`
 
-### Tasks (plan-to-code)
+### Tasks (generate-tasks)
 - Every task includes exact file paths
 - Embed all implementation details from plan
 - Tasks executable without referring back to plan.md
@@ -279,7 +311,10 @@ plugins/spec-kit/
 │   ├── clarify-spec.md
 │   ├── validate-spec.md
 │   ├── refine-plan.md
-│   └── validate-plan.md
+│   ├── validate-plan.md
+│   ├── refine-tasks.md
+│   ├── validate-tasks.md
+│   └── implement-tasks.md
 └── skills/
     ├── create-spec/
     │   ├── SKILL.md
@@ -289,14 +324,10 @@ plugins/spec-kit/
     │   ├── SKILL.md
     │   └── assets/
     │       └── plan-template.md
-    └── plan-to-code/
+    └── generate-tasks/
         ├── SKILL.md
-        ├── assets/
-        │   └── tasks-template.md
-        └── workflows/
-            ├── implement-tasks.md
-            ├── refine-tasks.md
-            └── validate-tasks.md
+        └── assets/
+            └── tasks-template.md
 ```
 
 ## License

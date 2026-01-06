@@ -1,19 +1,19 @@
 ---
-name: plan-to-code
-description: Generate, validate, refine, and execute actionable task lists from implementation plans. Use when users want to "create tasks", "generate tasks", "break down the plan", "convert plan to tasks", "validate tasks", "check tasks", "refine tasks", "implement tasks", "execute tasks", or "start implementation". Transforms validated plans into dependency-ordered, parallelizable task lists and executes them phase by phase.
+name: generate-tasks
+description: Generate actionable task lists from implementation plans. Use when users want to "create tasks", "generate tasks", "break down the plan", or "convert plan to tasks". Transforms validated plans into dependency-ordered, parallelizable task lists.
 license: MIT
 metadata:
   author: Retso Huang
-  version: "1.0"
+  version: "3.0"
 ---
 
-# Plan to Code
+# Generate Tasks
 
 Generates actionable, dependency-ordered task lists from implementation plans. Based on the principle that tasks should be "immediately executable" with sufficient specificity for LLM completion.
 
 ## Prerequisites
 
-This skill requires an existing implementation plan file (`plan.md`) with stage `Ready for Tasks`. The plan must be created and validated by the `spec-to-plan` skill before task generation can begin.
+This skill requires an existing implementation plan file (`plan.md`) with stage `Ready for Tasks`. The plan must be created by the `draft-plan` skill and validated with `/spec-kit:validate-plan` before task generation can begin.
 
 ## Stages
 
@@ -31,24 +31,24 @@ Tasks progress through four stages.
 
 ### Stage Definitions
 
-| Stage                        | Description                                         | Allowed Actions             | Exit Criteria                |
-| ---------------------------- | --------------------------------------------------- | --------------------------- | ---------------------------- |
-| **Waiting for Validation**   | Task list created, may have gaps or need refinement | Generate, Refine, Validate  | Validation passes all checks |
-| **Ready for Implementation** | Validated and ready for execution                   | Refine, Implement           | Implementation starts        |
-| **In Progress**              | Tasks are being implemented                         | Implement (continue)        | All selected phases complete |
-| **Ready to Test**            | All phases completed, ready for testing             | (hand off to testing)       | N/A - hand off to testing    |
+| Stage                        | Description                                         | Next Action                    | Exit Criteria                |
+| ---------------------------- | --------------------------------------------------- | ------------------------------ | ---------------------------- |
+| **Waiting for Validation**   | Task list created, may have gaps or need refinement | `/spec-kit:refine-tasks` or `/spec-kit:validate-tasks` | Validation passes |
+| **Ready for Implementation** | Validated and ready for execution                   | `/spec-kit:implement-tasks`    | Implementation starts        |
+| **In Progress**              | Tasks are being implemented                         | `/spec-kit:implement-tasks`    | All selected phases complete |
+| **Ready to Test**            | All phases completed, ready for testing             | (hand off to testing)          | N/A - terminal               |
 
 ### Stage Transition Rules
 
-| From                     | Action             | To                       | Notes                              |
-| ------------------------ | ------------------ | ------------------------ | ---------------------------------- |
-| (none)                   | Generate Tasks     | Waiting for Validation   | Creates tasks.md                   |
-| Waiting for Validation   | Refine             | Waiting for Validation   | Updates tasks with missing details |
-| Waiting for Validation   | Validate (pass)    | Ready for Implementation | All checks pass                    |
-| Waiting for Validation   | Validate (fail)    | Waiting for Validation   | Identifies gaps to fix             |
-| Ready for Implementation | Refine             | Waiting for Validation   | Requires re-validation             |
-| Ready for Implementation | Implement          | In Progress              | Starts executing tasks             |
-| In Progress              | Implement (finish) | Ready to Test            | All selected phases complete       |
+| From                     | Action                                | To                       | Notes                              |
+| ------------------------ | ------------------------------------- | ------------------------ | ---------------------------------- |
+| (none)                   | Generate (this skill)                 | Waiting for Validation   | Creates tasks.md                   |
+| Waiting for Validation   | `/spec-kit:refine-tasks`              | Waiting for Validation   | Updates tasks with missing details |
+| Waiting for Validation   | `/spec-kit:validate-tasks` (pass)     | Ready for Implementation | All checks pass                    |
+| Waiting for Validation   | `/spec-kit:validate-tasks` (fail)     | Waiting for Validation   | Identifies gaps to fix             |
+| Ready for Implementation | `/spec-kit:refine-tasks`              | Waiting for Validation   | Requires re-validation             |
+| Ready for Implementation | `/spec-kit:implement-tasks`           | In Progress              | Starts executing tasks             |
+| In Progress              | `/spec-kit:implement-tasks` (finish)  | Ready to Test            | All selected phases complete       |
 
 ## Input
 
@@ -64,7 +64,9 @@ The task generation produces a single actionable document:
 | ---------- | ----------------------------------------------------------------------------- |
 | `tasks.md` | Dependency-ordered task list organized by phases with parallelization markers |
 
-## Workflows
+## Workflow
+
+This skill handles task generation only. Use `/spec-kit:refine-tasks` to update task details, `/spec-kit:validate-tasks` to validate, and `/spec-kit:implement-tasks` to execute.
 
 ### Generate Tasks
 
@@ -170,44 +172,6 @@ specs/003-feature-name/
 ├── plan.md     (input - validated plan)
 └── tasks.md    (created by this skill, Stage: Waiting for Validation)
 ```
-
-### Refine Existing Tasks
-
-See [refine-tasks.md](workflows/refine-tasks.md) for the complete refinement workflow.
-
-**Stage:** Any Stage → Waiting for Validation
-
-Updates existing tasks.md based on user feedback:
-
-- Apply requested changes to task details, code samples, or descriptions
-- Cascade changes to related tasks to maintain consistency
-- Update shared types, interfaces, or patterns across affected tasks
-
-### Validate Tasks
-
-See [validate-tasks.md](workflows/validate-tasks.md) for the complete validation workflow.
-
-**Stage:** Any stage → Ready for Implementation (on pass)
-
-Can be run at any stage to identify gaps. Validates that tasks are complete, consistent with plan.md, and executable. Runs three check categories:
-
-- **Completeness**: Plan link, file paths, implementation details, phase coverage
-- **Consistency**: Plan alignment, task ordering, ID sequencing
-- **Executability**: Self-contained tasks, parallelization accuracy, verification criteria
-
-### Implement Tasks
-
-See [implement-tasks.md](workflows/implement-tasks.md) for the complete implementation workflow.
-
-**Stage:** Ready for Implementation → In Progress → Ready to Test
-
-Executes tasks phase by phase, marking each task complete as it finishes:
-
-- Implements all phases by default, or specified range if provided
-- Executes tasks in dependency order within each phase
-- Marks tasks `[x]` as completed
-- Stops immediately when detecting stuck in a loop
-- Transitions to Ready to Test when all phases complete
 
 ## Task Format
 

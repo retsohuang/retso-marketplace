@@ -201,4 +201,4 @@ See [plan-template.md](assets/plan-template.md) for the complete plan structure 
 ## Relationship to Other Skills
 
 - **create-spec** (before): Creates the spec this skill uses as input
-- **plan-to-code** (after): Uses validated plan to generate implementation
+- **generate-tasks** (after): Uses validated plan to generate implementation tasks
