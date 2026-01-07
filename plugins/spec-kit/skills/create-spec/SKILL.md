@@ -19,7 +19,9 @@ Specs progress through three stages:
 | -------------------------- | --------------------------------------------------------- | -------------------- |
 | **Draft**                  | Initial spec with gaps or `[NEEDS CLARIFICATION]` markers | `/spec-kit:clarify-spec`  |
 | **Waiting for Validation** | All gaps resolved, ready for validation                   | `/spec-kit:validate-spec` |
-| **Ready for Planning**     | Validated and complete                                    | spec-to-plan skill   |
+| **Ready for Planning**     | Validated with estimated story points                     | spec-to-plan skill   |
+
+**Story Points:** When a spec passes validation, story points are auto-estimated based on complexity (user stories, acceptance scenarios, NFRs, integrations). Uses fibonacci scale where 1 point = 1 hour of Senior Engineer effort.
 
 ## Workflow
 

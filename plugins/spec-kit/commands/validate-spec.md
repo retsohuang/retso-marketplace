@@ -65,8 +65,7 @@ Output validation results in this format:
 ### Step 4: Handle Results
 
 **If ALL checks pass:**
-- Update stage from `Waiting for Validation` to `Ready for Planning`
-- Inform user the spec is ready for planning with spec-to-plan skill
+- Proceed to Step 5 (Estimate Points)
 
 **If ANY check fails:**
 - Keep stage as `Waiting for Validation`
@@ -74,3 +73,34 @@ Output validation results in this format:
 - Fix issues directly if the answer is clear
 - Run `/spec-kit:clarify-spec` if user input needed
 - Re-run validation after fixes
+
+### Step 5: Estimate Story Points
+
+When validation passes, estimate story points based on spec complexity. Points use fibonacci scale (1, 2, 3, 5, 8, 13, 21) where **1 point = 1 hour** of Senior Engineer effort.
+
+**Estimation Factors:**
+
+| Factor | Weight | How to Count |
+|--------|--------|--------------|
+| User Stories | 2-4 pts each | Base complexity per story |
+| Acceptance Scenarios | 0.5-1 pt each | Additional test coverage |
+| NFRs (Non-Functional) | 1-3 pts each | Performance, security, scalability work |
+| Integrations | 2-5 pts each | External APIs, services mentioned |
+| Constraints | 1-2 pts each | Technical limitations adding complexity |
+
+**Estimation Guidelines:**
+
+| Total Points | Typical Scope |
+|--------------|---------------|
+| 1-3 | Trivial change, single file |
+| 5-8 | Small feature, few components |
+| 13-21 | Medium feature, multiple systems |
+| 21+ | Large feature, consider splitting |
+
+**Steps:**
+1. Count user stories, acceptance scenarios, NFRs, integrations, constraints
+2. Apply weights based on complexity indicators
+3. Round to nearest fibonacci number
+4. Update `**Estimated Points:**` field in spec frontmatter
+5. Update stage to `Ready for Planning`
+6. Inform user the spec is ready with estimated points

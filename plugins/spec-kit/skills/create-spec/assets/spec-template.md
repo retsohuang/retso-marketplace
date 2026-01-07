@@ -2,6 +2,7 @@
 
 **Feature ID:** {NNN}-{feature-name}
 **Stage:** Draft
+**Estimated Points:** -
 **Created:** {date}
 **Input**: User description: "$ARGUMENTS"
 
