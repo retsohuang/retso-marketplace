@@ -85,7 +85,7 @@ Output validation results in this format:
 
 **If ALL checks pass:**
 - Update stage from `Waiting for Validation` to `Ready for Tasks`
-- Inform user the plan is ready for task generation with plan-to-code skill
+- Inform user the plan is ready for task generation with `/generate-tasks` skill
 
 **If ANY check fails:**
 - Keep stage as `Waiting for Validation`
