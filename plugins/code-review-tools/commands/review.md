@@ -18,10 +18,10 @@ Where `<commit-hash>` is the starting commit to review from (reviews changes fro
 
 ## Instructions
 
-Invoke the `code-review-tools:code-review` skill with the commit hash from `$ARGUMENTS`:
+Invoke the `code-review` skill with the commit hash from `$ARGUMENTS`:
 
 ```
-/code-review-tools:code-review $ARGUMENTS
+/code-review $ARGUMENTS
 ```
 
 The skill handles the entire review workflow:
