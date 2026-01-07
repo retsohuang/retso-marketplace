@@ -36,7 +36,7 @@ Read the plan file at `$ARGUMENTS/plan.md` and the linked spec file.
 | Spec link | Plan references source spec.md | Add spec link |
 | Technical context | All fields populated (language, dependencies, platform) | Fill missing fields |
 | Architecture | Components and data flow defined | Define architecture |
-| Implementation details | Code samples for types and APIs present | Add code samples |
+| Key patterns | Patterns identified with rationale | Add pattern documentation |
 | Implementation phases | At least 2 phases with concrete tasks | Define phases |
 | No open markers | Zero `[NEEDS DECISION]` markers remain | Resolve or ask user |
 
@@ -54,8 +54,8 @@ Read the plan file at `$ARGUMENTS/plan.md` and the linked spec file.
 | Check | Validation | Failure Action |
 |-------|------------|----------------|
 | Decision rationale | Every key decision has rationale and alternatives | Add missing rationale |
-| Type definitions | Interfaces have field descriptions or are self-documenting | Add clarity to types |
-| Phase scope | Each phase has concrete tasks with detailed implementation guidance | Add implementation details to tasks |
+| Pattern clarity | Each pattern has clear rationale for why it was chosen | Add pattern rationale |
+| Phase scope | Each phase has concrete tasks with clear objectives | Add clarity to task objectives |
 | Risk coverage | Major technical risks identified with mitigations | Add risk analysis |
 
 ### Step 5: Report Results
@@ -68,7 +68,7 @@ Output validation results in this format:
 ### Completeness: PASS | FAIL
 - [x] Spec link present
 - [x] Technical context complete
-- [ ] Missing: Implementation details code samples
+- [ ] Missing: Key patterns with rationale
 
 ### Consistency: PASS | FAIL
 - [x] All acceptance criteria mapped
@@ -76,7 +76,7 @@ Output validation results in this format:
 
 ### Clarity: PASS | FAIL
 - [x] All decisions have rationale
-- [x] Phases appropriately scoped
+- [x] Patterns have clear rationale
 
 **Result:** {Pass | Fail (N issues to resolve)}
 ```
@@ -103,7 +103,7 @@ Output validation results in this format:
 1. Loads `specs/003-realtime-chat/plan.md` and linked spec
 2. Runs validation checks
 3. Finds issues:
-   - Missing code sample for WebSocket message handler
+   - Missing rationale for event-driven pattern choice
    - Acceptance criterion "offline message queue" not mapped to any phase
 4. Reports:
    ```
@@ -112,7 +112,7 @@ Output validation results in this format:
    ### Completeness: FAIL
    - [x] Spec link present
    - [x] Technical context complete
-   - [ ] Missing: WebSocket message handler code sample
+   - [ ] Missing: Pattern rationale for event-driven architecture
 
    ### Consistency: FAIL
    - [ ] Spec criterion "offline message queue" not addressed

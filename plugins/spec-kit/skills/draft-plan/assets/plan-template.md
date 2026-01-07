@@ -88,59 +88,27 @@
 
 ---
 
-## Implementation Details
+## Key Patterns
 
-{Include code samples for key interfaces, types, and patterns that guide implementation}
+{Document patterns to follow - describe WHAT pattern and WHY, not implementation code}
 
-### Core Types
+### Pattern 1: {Pattern Name}
 
-```typescript
-// Example: Define key interfaces and types
-interface {EntityName} {
-  id: string;
-  {field}: {type};
-  {field}: {type};
-  createdAt: Date;
-  updatedAt: Date;
-}
+- **Pattern**: {e.g., Repository pattern, Singleton, Event-driven}
+- **Where**: {Which components use this pattern}
+- **Rationale**: {Why this pattern fits the requirements}
 
-type {ActionResult} = {
-  success: boolean;
-  data?: {DataType};
-  error?: string;
-};
-```
+### Pattern 2: {Pattern Name}
 
-### API Contracts
+- **Pattern**: {e.g., Factory, Observer, Strategy}
+- **Where**: {Which components use this pattern}
+- **Rationale**: {Why this pattern fits the requirements}
 
-```typescript
-// Example: Key API endpoints or function signatures
-// POST /api/{resource}
-type Create{Resource}Request = {
-  {field}: {type};
-};
+### Pattern 3: {Pattern Name}
 
-type Create{Resource}Response = {
-  id: string;
-  {field}: {type};
-};
-
-// GET /api/{resource}/:id
-type Get{Resource}Response = {EntityName};
-```
-
-### Key Patterns
-
-{Include code samples for important implementation patterns}
-
-```typescript
-// Example: Error handling pattern
-const handle{Action} = async (input: {InputType}): Promise<{ResultType}> => {
-  // Validation
-  // Core logic
-  // Error handling
-};
-```
+- **Pattern**: {e.g., Error boundary, Retry with backoff, Circuit breaker}
+- **Where**: {Which components use this pattern}
+- **Rationale**: {Why this pattern fits the requirements}
 
 ---
 
@@ -150,31 +118,26 @@ const handle{Action} = async (input: {InputType}): Promise<{ResultType}> => {
 
 **{Task 1}**
 - What: {Description of what to build}
-- How: {Implementation approach and key steps}
 - Files: {Files to create or modify}
 
 **{Task 2}**
 - What: {Description of what to build}
-- How: {Implementation approach and key steps}
 - Files: {Files to create or modify}
 
 ### Phase 2: {Name} - Core Features
 
 **{Task 1}**
 - What: {Description of what to build}
-- How: {Implementation approach and key steps}
 - Files: {Files to create or modify}
 
 **{Task 2}**
 - What: {Description of what to build}
-- How: {Implementation approach and key steps}
 - Files: {Files to create or modify}
 
 ### Phase 3: {Name} - Polish & Integration
 
 **{Task 1}**
 - What: {Description of what to build}
-- How: {Implementation approach and key steps}
 - Files: {Files to create or modify}
 
 ---
@@ -239,7 +202,7 @@ Before advancing to the next stage, verify:
 - [ ] Technical context is fully specified
 - [ ] Architecture components are defined
 - [ ] Data model defined (if applicable)
-- [ ] Implementation details with code samples provided
+- [ ] Key patterns identified with rationale
 - [ ] Key decisions include rationale
 - [ ] Implementation phases are sequential and logical
 - [ ] Quickstart provided (if complex setup)

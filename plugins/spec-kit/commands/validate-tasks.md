@@ -35,7 +35,7 @@ Read the tasks file at `$ARGUMENTS/tasks.md` and the linked plan file.
 |-------|------------|----------------|
 | Plan link | Tasks reference source plan.md | Add plan link |
 | File paths | Every task has exact file path in backticks | Add missing paths |
-| Implementation details | Every task has code samples/types from plan | Add missing details |
+| Implementation details | Tasks have generated code based on plan decisions | Add missing details |
 | Phase coverage | All plan phases represented in task list | Add missing tasks |
 | No placeholders | Zero `{placeholder}` or TODO markers remain | Resolve or ask user |
 
@@ -43,7 +43,7 @@ Read the tasks file at `$ARGUMENTS/tasks.md` and the linked plan file.
 
 | Check | Validation | Failure Action |
 |-------|------------|----------------|
-| Plan alignment | Task implementation details match plan.md | Sync with plan |
+| Pattern alignment | Task implementations follow plan's key patterns | Align with plan patterns |
 | Task ordering | Foundational tasks precede dependent tasks | Reorder tasks |
 | ID sequencing | Task IDs are sequential (T001, T002, ...) | Renumber tasks |
 | Phase structure | Tasks grouped correctly by phase | Reorganize phases |
@@ -52,7 +52,7 @@ Read the tasks file at `$ARGUMENTS/tasks.md` and the linked plan file.
 
 | Check | Validation | Failure Action |
 |-------|------------|----------------|
-| Self-contained | Each task executable without referring to plan | Add missing context |
+| Plan reference | Tasks reference plan.md for architectural consistency | Add plan reference |
 | Parallelization | `[P]` markers only on truly independent tasks | Fix markers |
 | Dependency clarity | Blocking dependencies are obvious from ordering | Add dependency notes |
 | Verification criteria | Each phase has testable verification steps | Add verification |
@@ -72,10 +72,10 @@ Output validation results in this format:
 ### Consistency: PASS | FAIL
 - [x] Task ordering correct
 - [x] IDs sequential
-- [ ] Issue: T003 implementation differs from plan
+- [ ] Issue: T003 doesn't follow plan's repository pattern
 
 ### Executability: PASS | FAIL
-- [x] All tasks self-contained
+- [x] Tasks reference plan for consistency
 - [x] Parallelization markers accurate
 - [x] Verification criteria present
 
@@ -104,7 +104,7 @@ Output validation results in this format:
 1. Loads `specs/003-realtime-chat/tasks.md` and linked plan.md
 2. Runs validation checks
 3. Finds issues:
-   - T005 missing Zod schema code sample (in plan but not in task)
+   - T005 doesn't follow plan's validation pattern
    - Phase 3 missing verification criteria
 4. Reports:
    ```
@@ -113,7 +113,7 @@ Output validation results in this format:
    ### Completeness: FAIL
    - [x] Plan link present
    - [x] All tasks have file paths
-   - [ ] Missing: T005 lacks Zod schema code sample
+   - [ ] Missing: T005 lacks validation implementation
 
    ### Consistency: PASS
    - [x] Task ordering correct
@@ -121,7 +121,7 @@ Output validation results in this format:
    - [x] Phase structure correct
 
    ### Executability: FAIL
-   - [x] All tasks self-contained
+   - [x] Tasks reference plan for consistency
    - [x] Parallelization markers accurate
    - [ ] Missing: Phase 3 verification criteria
 

@@ -55,7 +55,7 @@ The planning phase generates a single comprehensive document:
 
 | Output    | Purpose                                                                                                                  |
 | --------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `plan.md` | Complete technical strategy including architecture, data model, implementation details with code samples, and quickstart |
+| `plan.md` | Complete technical strategy including architecture, data model, key patterns with rationale, and quickstart |
 
 The plan includes optional sections (Data Model, Quickstart) that are included when relevant to the feature.
 
@@ -140,11 +140,11 @@ Use when the user provides a spec file path and wants to create an implementatio
    - Design database schema if persistence needed
    - Include in Data Model section of plan
 
-5. **Define APIs & Implementation Details**
-   - Specify component interfaces with code samples
-   - Define API contracts (request/response types)
-   - Document key patterns and type definitions
-   - Include code samples for complex logic
+5. **Identify Key Patterns**
+   - Document patterns to follow (e.g., repository, singleton, event-driven)
+   - Specify which components use each pattern
+   - Include rationale for pattern choices
+   - Focus on WHAT pattern and WHY, not implementation code
 
 6. **Validate Plan**
    - Cross-check plan against spec requirements
@@ -164,7 +164,7 @@ specs/003-feature-name/
 ## Quality Guards
 
 - Plan must link to its source spec file
-- Include code samples for interfaces, types, and key patterns
+- Identify patterns to follow with rationale (no code samples)
 - Every decision must include brief rationale
 - Unknowns marked with `[NEEDS DECISION: specific question]`
 - Architecture stays high-level (components, not classes)
@@ -193,7 +193,7 @@ See [plan-template.md](assets/plan-template.md) for the complete plan structure 
 6. Generates `plan.md` with:
    - Architecture and implementation phases
    - Data Model section with message/user schemas
-   - Implementation Details with TypeScript interfaces and API contracts
+   - Key Patterns (e.g., event-driven for real-time, repository for data access)
    - Key Decisions documenting Socket.io vs ws choice
    - Quickstart for WebSocket setup
 7. Saves to `specs/003-realtime-chat/plan.md`

@@ -133,11 +133,10 @@ Use when the user provides a plan file path and wants to generate implementation
    - Parse implementation phases from plan
    - Break down each phase into discrete tasks
    - Extract priority levels from phase ordering
-   - **Carry forward all implementation details** from plan to each task:
-     - Code samples and type definitions
-     - API contracts and interfaces
-     - Key patterns and approaches
-     - File-specific guidance
+   - **Generate implementation details** based on plan's technical decisions:
+     - Create code samples based on key patterns from plan
+     - Design type definitions following plan's architecture
+     - Reference plan.md for pattern and architecture consistency
 
 3. **Order by Priority**
    - Organize tasks by phase in priority order
@@ -175,7 +174,7 @@ specs/003-feature-name/
 
 ## Task Format
 
-Tasks follow a specific format for machine-readability and executability. Each task includes **all implementation details** from the plan so it can be executed without referring back to plan.md.
+Tasks follow a specific format for machine-readability and executability. Each task includes **generated implementation details** based on plan decisions, referencing plan.md for architectural consistency.
 
 ```
 - [ ] [TaskID] [P] Description with exact file path
@@ -244,8 +243,8 @@ Tasks are organized into sequential phases matching the plan's implementation ph
 ## Quality Guards
 
 - Every task must include exact file paths
-- **Every task must include all implementation details from plan** (code samples, types, patterns)
-- Tasks must be immediately executable by an LLM without referring back to plan.md
+- Tasks generate implementation details based on plan's key patterns and decisions
+- Tasks reference plan.md for pattern and architecture consistency
 - Task descriptions focus on "what" and "where", not "why"
 - Parallelization markers only where truly independent
 - Tests are optional but if included, must be TDD (write first, ensure fail)

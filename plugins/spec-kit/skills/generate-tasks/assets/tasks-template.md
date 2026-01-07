@@ -20,11 +20,11 @@ Project initialization and configuration.
 
 - [ ] [T001] {Description} at `{file-path}`
 
-  {Implementation details from plan: dependencies, scripts, configuration}
+  {Implementation details based on plan decisions: dependencies, scripts, configuration}
 
 - [ ] [T002] {Description} at `{file-path}`
 
-  {Implementation details from plan}
+  {Implementation details based on plan decisions}
 
 ---
 
@@ -34,7 +34,7 @@ Critical infrastructure that blocks all feature work. **No feature work can begi
 
 - [ ] [T003] [P] {Description} at `{file-path}`
 
-  {Implementation details: patterns, code samples}
+  {Implementation details based on plan patterns}
 
 - [ ] [T004] [P] {Description} at `{file-path}`
 
@@ -45,7 +45,7 @@ Critical infrastructure that blocks all feature work. **No feature work can begi
 
 - [ ] [T005] {Description} at `{file-path}`
 
-  {Implementation guidance from plan}
+  {Implementation guidance based on plan decisions}
 
 ---
 
@@ -63,8 +63,8 @@ Critical infrastructure that blocks all feature work. **No feature work can begi
   }
   ```
 
-  - {Additional guidance from plan}
-  - {Patterns to follow}
+  - {Additional guidance based on plan decisions}
+  - {Patterns to follow from plan}
 
 - [ ] [T007] [P] {Description} at `{file-path}`
 
@@ -76,7 +76,7 @@ Critical infrastructure that blocks all feature work. **No feature work can begi
 
 - [ ] [T008] {Description} at `{file-path}`
 
-  {Implementation details: logic, patterns, integrations}
+  {Implementation details based on plan decisions}
 
 ### Verification
 
@@ -91,11 +91,11 @@ Critical infrastructure that blocks all feature work. **No feature work can begi
 
 - [ ] [T009] [P] {Description} at `{file-path}`
 
-  {Implementation details from plan}
+  {Implementation details based on plan decisions}
 
 - [ ] [T010] {Description} at `{file-path}`
 
-  {Implementation details from plan}
+  {Implementation details based on plan decisions}
 
 ### Verification
 
@@ -109,15 +109,15 @@ Cross-cutting improvements and cleanup.
 
 - [ ] [T011] [P] {Description} at `{file-path}`
 
-  {Implementation details}
+  {Implementation details based on plan decisions}
 
 - [ ] [T012] [P] {Description} at `{file-path}`
 
-  {Implementation details}
+  {Implementation details based on plan decisions}
 
 - [ ] [T013] {Description} at `{file-path}`
 
-  {Implementation details}
+  {Implementation details based on plan decisions}
 
 ---
 
@@ -161,7 +161,7 @@ Adjust paths based on project structure:
 
 ## Task Format Reference
 
-Each task includes all implementation details from plan.md so it can be executed without referring back to the plan.
+Tasks reference plan.md for architectural context and pattern consistency. Implementation details are generated based on plan decisions.
 
 ```
 - [ ] [TaskID] [P] Description with exact `file/path.ts`
@@ -169,10 +169,10 @@ Each task includes all implementation details from plan.md so it can be executed
         │       └─ Parallelizable marker - only when truly independent
         └─ Sequential ID - T001, T002, T003...
 
-  Implementation details from plan:
-  - Code samples (types, interfaces, patterns)
+  Implementation details (generated based on plan decisions):
+  - Code samples following plan's key patterns
+  - Type definitions aligned with plan's architecture
   - Specific guidance for this file
-  - API contracts, dependencies
 ```
 
 **Rules:**
@@ -180,5 +180,5 @@ Each task includes all implementation details from plan.md so it can be executed
 - TaskID is sequential across entire file
 - `[P]` marker only for tasks that can run simultaneously
 - Description must include exact file path in backticks
-- **Each task must include all relevant implementation details from plan.md**
+- **Tasks reference plan.md for pattern and architecture consistency**
 
