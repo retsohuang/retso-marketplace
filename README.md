@@ -189,7 +189,6 @@ The marketplace is configured in `.claude-plugin/marketplace.json`. Key fields:
 | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ---------- |
 | [code-review-tools](./plugins/code-review-tools/README.md) | Review code changes commit-by-commit with custom rules support. Includes interactive setup and rule creation.                                                 | 2.1.1   | Manual ¹   |
 | [github-tools](./plugins/github-tools/README.md)           | GitHub workflow tools for daily development. Analyze PR review comments and categorize what needs fixing.                                                     | 0.1.1   | Either     |
-| [spec-kit](./plugins/spec-kit/README.md)                   | Spec-Driven Development toolkit for Claude Code. Create specifications, plans, and tasks following a structured workflow from requirements to implementation. | 0.1.0   | Marketplace |
 
 ¹ **Manual installation recommended** - Supports custom review rules in the `references/` directory, which requires local file access not available via marketplace installation.
 

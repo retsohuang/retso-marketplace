@@ -44,26 +44,6 @@
         "workflow"
       ],
       "category": "development"
-    },
-    {
-      "name": "spec-kit",
-      "description": "Spec-Driven Development toolkit for Claude Code. Create specifications, plans, and tasks following a structured workflow from requirements to implementation.",
-      "version": "0.1.0",
-      "source": "./plugins/spec-kit",
-      "author": {
-        "name": "Retso Huang",
-        "email": "retsohuang@gmail.com"
-      },
-      "license": "MIT",
-      "keywords": [
-        "spec-driven-development",
-        "specifications",
-        "planning",
-        "requirements",
-        "workflow",
-        "development"
-      ],
-      "category": "development"
     }
   ]
 }
