@@ -10,6 +10,14 @@ import type {
 import { PluginManifestSchema } from '../types/plugin'
 import { transformPlugin } from './transform'
 
+export interface InstallFsLike {
+  access: (path: string) => Promise<void>
+}
+
+const defaultFs: InstallFsLike = {
+  access,
+}
+
 async function commandExists(cmd: string): Promise<boolean> {
   try {
     const proc = Bun.spawn(['which', cmd], { stdout: 'pipe', stderr: 'pipe' })
@@ -57,9 +65,24 @@ export function expandPath(path: string): string {
   return path
 }
 
+export async function shouldRemoveExistingPath(
+  path: string,
+  override: boolean,
+  fs: InstallFsLike = defaultFs,
+): Promise<boolean> {
+  if (!override) return false
+  try {
+    await fs.access(path)
+    return true
+  } catch {
+    return false
+  }
+}
+
 export async function checkExistingPlugins(
   plugins: PluginWithContent[],
   targetDir: string,
+  fs: InstallFsLike = defaultFs,
 ): Promise<ExistingPlugin[]> {
   const expandedDir = expandPath(targetDir)
   const existing: ExistingPlugin[] = []
@@ -68,7 +91,7 @@ export async function checkExistingPlugins(
     // Check if commands namespace exists
     const commandsPath = join(expandedDir, 'commands', plugin.name)
     try {
-      await access(commandsPath)
+      await fs.access(commandsPath)
       existing.push({
         plugin: { name: plugin.name, description: plugin.description },
         path: commandsPath,
@@ -199,6 +222,9 @@ export async function installPlugins(
 
         // Copy skills (keep structure)
         for (const { source, target } of transform.skills) {
+          if (await shouldRemoveExistingPath(target, options?.override ?? false)) {
+            await moveToTrash(target)
+          }
           await mkdir(dirname(target), { recursive: true })
           await copyDirectory(source, target)
           installed.skills.push(target)

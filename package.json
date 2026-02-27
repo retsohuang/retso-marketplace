@@ -5,9 +5,7 @@
     "prepare": "lefthook install",
     "build": "bun run --filter '*' build",
     "test": "bun run --filter '*' test",
-    "typecheck": "bun run --filter '*' typecheck",
-    "lint": "bun run --filter '*' lint",
-    "format": "bun run --filter '*' format"
+    "typecheck": "bun run --filter '*' typecheck"
   },
   "dependencies": {
     "isomorphic-git": "^1.36.0",

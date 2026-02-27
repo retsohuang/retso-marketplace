@@ -17,8 +17,7 @@ Only bump versions when explicitly requested.
 cli/                             # React + Ink terminal UI for plugin installation
 plugins/
   ├── code-review-tools/         # Commit-by-commit code review
-  ├── github-tools/              # PR creation and comment analysis
-  └── spec-kit/                  # Spec-driven development workflow
+  └── github-tools/              # PR creation and comment analysis
 ```
 
 **Key relationship**: `.claude-plugin/marketplace.json` entries have a `source` field pointing to `./plugins/<name>`.

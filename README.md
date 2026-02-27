@@ -77,6 +77,22 @@ List available plugins:
 /plugin marketplace list
 ```
 
+## Testing Plugins Locally
+
+Use the `--plugin-dir` flag to test any plugin during development without installing it:
+
+```bash
+claude --plugin-dir ./plugins/my-plugin
+```
+
+Once Claude Code starts, try your plugin's skills with `/plugin-name:skill-name`. You can load multiple plugins at once:
+
+```bash
+claude --plugin-dir ./plugins/plugin-one --plugin-dir ./plugins/plugin-two
+```
+
+Restart Claude Code to pick up changes as you iterate on your plugin.
+
 ## Adding Plugins to This Marketplace
 
 ### Local Plugins
@@ -173,7 +189,6 @@ The marketplace is configured in `.claude-plugin/marketplace.json`. Key fields:
 | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ---------- |
 | [code-review-tools](./plugins/code-review-tools/README.md) | Review code changes commit-by-commit with custom rules support. Includes interactive setup and rule creation.                                                 | 2.1.1   | Manual ¹   |
 | [github-tools](./plugins/github-tools/README.md)           | GitHub workflow tools for daily development. Analyze PR review comments and categorize what needs fixing.                                                     | 0.1.1   | Either     |
-| [spec-kit](./plugins/spec-kit/README.md)                   | Spec-Driven Development toolkit for Claude Code. Create specifications, plans, and tasks following a structured workflow from requirements to implementation. | 0.1.0   | Marketplace |
 
 ¹ **Manual installation recommended** - Supports custom review rules in the `references/` directory, which requires local file access not available via marketplace installation.
 
