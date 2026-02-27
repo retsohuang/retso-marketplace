@@ -77,6 +77,22 @@ List available plugins:
 /plugin marketplace list
 ```
 
+## Testing Plugins Locally
+
+Use the `--plugin-dir` flag to test any plugin during development without installing it:
+
+```bash
+claude --plugin-dir ./plugins/my-plugin
+```
+
+Once Claude Code starts, try your plugin's skills with `/plugin-name:skill-name`. You can load multiple plugins at once:
+
+```bash
+claude --plugin-dir ./plugins/plugin-one --plugin-dir ./plugins/plugin-two
+```
+
+Restart Claude Code to pick up changes as you iterate on your plugin.
+
 ## Adding Plugins to This Marketplace
 
 ### Local Plugins
