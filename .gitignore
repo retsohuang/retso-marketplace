@@ -10,6 +10,7 @@ Thumbs.db
 # Claude Code settings
 .claude/
 .mcp.json
+.worktreeinclude.yaml
 
 # Node modules (if plugins use npm)
 node_modules/
