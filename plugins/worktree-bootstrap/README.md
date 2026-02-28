@@ -57,6 +57,45 @@ Use the `configure` skill to create or update `.worktreeinclude.yaml`:
 "set up worktree config"
 ```
 
+## Limitations
+
+- **Plugin hooks not fired for `--worktree` startup**: When using `claude --worktree`, Claude Code creates the worktree during initialization **before** plugin hooks are registered. The `WorktreeCreate` hook from this plugin is loaded but not yet active at the time the worktree is created, so the default built-in behavior runs instead.
+
+- **Mid-session worktree creation**: The `/worktree` command and `EnterWorktree` tool used mid-session do not fire `WorktreeCreate` hooks at all. Only `claude --worktree` (CLI flag) and `isolation: "worktree"` (subagent config) trigger these hooks.
+
+### Workaround
+
+Until the plugin hook timing is resolved, add the hooks directly to your project's `.claude/settings.json` or `.claude/settings.local.json` (settings are loaded before worktree creation):
+
+```json
+{
+  "hooks": {
+    "WorktreeCreate": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /path/to/worktree-bootstrap/scripts/worktree-create.sh"
+          }
+        ]
+      }
+    ],
+    "WorktreeRemove": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /path/to/worktree-bootstrap/scripts/worktree-remove.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Replace `/path/to/worktree-bootstrap/` with the actual path to the plugin's directory.
+
 ## Requirements
 
 - Python 3 (for file copying; falls back to basic worktree creation without it)
