@@ -35,3 +35,5 @@ build/
 *.bun-build
 */dist/
 cli/src/generated/
+.spectra/
+openspec/.vector-search.db
