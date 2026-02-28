@@ -1,5 +1,5 @@
 ---
-name: config
+name: configure
 description: Create or update .worktreeinclude.yaml configuration for worktree-bootstrap. Use when user says "set up worktree config", "configure worktree bootstrap", "add files to worktree include", "worktree bootstrap config", or provides file paths to include in worktree bootstrap.
 license: MIT
 allowed-tools: Bash Read Write
@@ -14,7 +14,7 @@ Create or update `.worktreeinclude.yaml` to configure which ignored files get co
 
 ## Input
 
-Arguments after the skill invocation are treated as file or directory paths to add (e.g., `/worktree-bootstrap:config .env .env.local`). If no arguments are provided, check the user's message for file/directory references.
+Arguments after the skill invocation are treated as file or directory paths to add (e.g., `/worktree-bootstrap:configure .env .env.local`). If no arguments are provided, check the user's message for file/directory references.
 
 ## Steps
 

@@ -41,16 +41,16 @@ files:
 
 Only files that are gitignored (via `.gitignore`, `.git/info/exclude`, or global gitignore) will be copied. Tracked files are skipped.
 
-## Config Skill
+## Configure Skill
 
-Use the `config` skill to create or update `.worktreeinclude.yaml`:
+Use the `configure` skill to create or update `.worktreeinclude.yaml`:
 
 ```
 # Scaffold config by scanning for ignored files
-/worktree-bootstrap:config
+/worktree-bootstrap:configure
 
 # Add specific files
-/worktree-bootstrap:config .env .env.local
+/worktree-bootstrap:configure .env .env.local
 
 # Or use natural language
 "add .env.production to worktree bootstrap"
