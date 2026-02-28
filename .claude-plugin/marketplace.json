@@ -44,6 +44,24 @@
         "workflow"
       ],
       "category": "development"
+    },
+    {
+      "name": "worktree-bootstrap",
+      "description": "Automatically copy gitignored files to new worktrees using .worktreeinclude.yaml",
+      "version": "0.1.0",
+      "source": "./plugins/worktree-bootstrap",
+      "author": {
+        "name": "Retso Huang",
+        "email": "retsohuang@gmail.com"
+      },
+      "license": "MIT",
+      "keywords": [
+        "worktree",
+        "env",
+        "bootstrap",
+        "hooks"
+      ],
+      "category": "development"
     }
   ]
 }
