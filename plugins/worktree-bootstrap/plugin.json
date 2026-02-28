@@ -1,0 +1,33 @@
+{
+  "name": "worktree-bootstrap",
+  "version": "0.1.0",
+  "description": "Automatically copy gitignored files to new worktrees using .worktreeinclude.yaml",
+  "author": {
+    "name": "Retso Huang",
+    "email": "retsohuang@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["worktree", "env", "bootstrap", "hooks"],
+  "hooks": {
+    "WorktreeCreate": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/worktree-create.sh"
+          }
+        ]
+      }
+    ],
+    "WorktreeRemove": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/worktree-remove.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
