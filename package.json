@@ -1,6 +1,6 @@
 {
   "private": true,
-  "workspaces": ["plugins/*/scripts", "cli"],
+  "workspaces": ["plugins/*/scripts"],
   "scripts": {
     "prepare": "lefthook install",
     "build": "bun run --filter '*' build",

@@ -1,9 +1,28 @@
 #!/usr/bin/env bun
 import { access, readFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
-import { PluginManifestSchema } from '../src/types/plugin'
+import { z } from 'zod'
 
-export interface ValidationResult {
+const PluginManifestSchema = z.object({
+  name: z
+    .string()
+    .min(1)
+    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),
+  description: z.string().min(1),
+  version: z.string().regex(/^\d+\.\d+\.\d+$/),
+  author: z
+    .object({
+      name: z.string(),
+      email: z.string().email(),
+    })
+    .optional(),
+  license: z.string().optional(),
+  keywords: z.array(z.string()).optional(),
+  commands: z.array(z.string()).optional(),
+  agents: z.array(z.string()).optional(),
+})
+
+interface ValidationResult {
   valid: boolean
   message?: string
   name?: string
@@ -11,7 +30,7 @@ export interface ValidationResult {
   version?: string
 }
 
-export async function validatePlugin(pluginPath: string): Promise<ValidationResult> {
+async function validatePlugin(pluginPath: string): Promise<ValidationResult> {
   const pluginName = basename(pluginPath)
 
   // Check plugin.json exists

@@ -59,7 +59,7 @@ jobs:
             [ -z "$plugin_dir" ] && continue
             if [ -f "${plugin_dir}/plugin.json" ]; then
               echo "Validating: $plugin_dir"
-              if ! bun cli/scripts/validate-plugin.ts "$plugin_dir"; then
+              if ! bun scripts/validate-plugin.ts "$plugin_dir"; then
                 failed=1
               fi
             fi
