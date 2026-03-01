@@ -48,5 +48,12 @@
 
 ## 9. Verification
 
-- [ ] 9.1 Push and confirm CI passes on PR #17
+- [x] 9.1 Push and confirm CI passes on PR #17
 - [x] 9.2 Commit all changes
+
+## 10. Cleanup orphaned Node.js config files
+
+- [x] 10.1 Delete `.oxlintrc.json` — references `node_modules/oxlint` which no longer exists
+- [x] 10.2 Delete `.prettierrc` — Node tooling config with no runtime to use it
+- [x] 10.3 Add `worktree-bootstrap` to the Architecture diagram in `CLAUDE.md`
+- [x] 10.4 Commit cleanup changes
