@@ -16,7 +16,8 @@ Only bump versions when explicitly requested.
 .claude-plugin/marketplace.json  # Plugin registry (references plugins via source field)
 plugins/
   ├── code-review-tools/         # Commit-by-commit code review
-  └── github-tools/              # PR creation and comment analysis
+  ├── github-tools/              # PR creation and comment analysis
+  └── worktree-bootstrap/        # Auto-copy gitignored files to new worktrees
 ```
 
 **Key relationship**: `.claude-plugin/marketplace.json` entries have a `source` field pointing to `./plugins/<name>`.
