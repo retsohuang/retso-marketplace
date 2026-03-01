@@ -1,14 +1,14 @@
 ## Summary
 
-Remove the "Manual ¹" install label and its footnote from the README's Available Plugins table.
+Remove the Install column from the README's Available Plugins table.
 
 ## Motivation
 
-The "Manual installation recommended" footnote was added when the CLI installer existed and marketplace installation couldn't handle plugins with local `references/` directories. The CLI has since been removed, making the distinction between "Manual" and "Either" install methods meaningless — all plugins now install the same way via `--plugin-dir` or marketplace.
+The Install column distinguished between "Manual" and "Either" installation methods, which only made sense when the CLI installer existed. The CLI has been removed — all plugins now install the same way via marketplace or `--plugin-dir`. The column adds no information.
 
 ## Proposed Solution
 
-- Change `code-review-tools` Install column from `Manual ¹` to `Either`
+- Remove the entire Install column from the Available Plugins table
 - Remove the footnote explaining manual installation
 
 ## Capabilities
@@ -23,4 +23,4 @@ The "Manual installation recommended" footnote was added when the CLI installer 
 
 ## Impact
 
-- Affected code: `README.md` (Available Plugins table, footnote)
+- Affected code: `README.md` (Available Plugins table)
