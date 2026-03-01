@@ -126,7 +126,8 @@ A typical plugin in this marketplace should follow this structure:
 
 ```
 plugins/my-plugin/
-├── plugin.json          # Plugin metadata (optional if strict: false)
+├── .claude-plugin/
+│   └── plugin.json      # Plugin metadata
 ├── commands/            # Slash commands
 │   └── my-command.md
 ├── agents/              # AI agents

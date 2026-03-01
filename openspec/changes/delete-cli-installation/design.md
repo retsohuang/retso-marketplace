@@ -1,36 +1,38 @@
 ## Context
 
-The `cli/` directory contains a React + Ink terminal UI (`plugin-kit`) for interactive plugin installation. It was the only way to install plugins before Claude Code added native `--plugin-dir` and marketplace support. The CLI is now unused but still referenced in workspaces, CI, README, and project docs.
-
-The `cli/scripts/validate-plugin.ts` script is independently useful — it validates `plugin.json` manifests in CI — and must be preserved.
+The `cli/` directory has been removed (phase 1 complete). However, the CI `check` job now fails because `bun run --filter '*' build` finds no matching workspaces. More broadly, the entire Node.js/Bun toolchain is dead weight — no plugins use node/bun, and the validate script checks for `plugin.json` at the plugin root which no longer exists. Plugins now store metadata at `.claude-plugin/plugin.json`.
 
 ## Goals / Non-Goals
 
 **Goals:**
 
-- Remove all CLI installer code and its dependencies
-- Preserve the plugin validation script for CI use
-- Clean up all references to the CLI across project files
+- Fix the CI build failure
+- Remove all Node.js/Bun toolchain files (`package.json`, `bun.lock`, `lefthook.yml`, `node_modules/`)
+- Replace the TypeScript validation script with a shell script that validates `.claude-plugin/plugin.json`
+- Update documentation to reflect the current plugin structure
 
 **Non-Goals:**
 
 - Changing any plugin structure or marketplace behavior
-- Modifying the validation logic itself
-- Removing CLI-related dependencies from root `package.json` (only workspace removal)
+- Adding new CI checks beyond plugin validation
 
 ## Decisions
 
-### Inline the Zod schema into validate-plugin.ts
+### Replace validate-plugin.ts with shell script
 
-The validate script imports `PluginManifestSchema` from `cli/src/types/plugin.ts`. Rather than keeping a separate types file, inline the schema directly into `scripts/validate-plugin.ts`. The schema is small (~15 lines) and the validate script is its only remaining consumer.
+The TypeScript validation script requires Bun and Zod. Since we're removing the entire Node.js toolchain, rewrite it as `scripts/validate-plugin.sh` using `jq` (pre-installed on Ubuntu CI runners). The new script validates `.claude-plugin/plugin.json` instead of root `plugin.json`.
 
-**Alternative**: Create `scripts/types/plugin.ts` as a separate file. Rejected because it adds unnecessary file structure for a single small schema.
+**Alternative**: Keep Bun just for the validate script. Rejected because maintaining an entire runtime for one small script is excessive.
 
-### Delete cli/ entirely before relocating
+### Remove the check CI job entirely
 
-Delete the entire `cli/` directory first, then create the new `scripts/validate-plugin.ts` with inlined schema. This is cleaner than a partial move.
+The `check` job ran `build`, `typecheck`, and `test` — all delegating to workspaces via `--filter '*'`. No workspaces exist anymore. Remove the job entirely rather than trying to make it work.
+
+### Remove lefthook pre-commit hooks
+
+The lefthook hooks only trigger on `plugins/*/scripts/**/*.{ts,js}` files which no longer exist. Remove `lefthook.yml` entirely.
 
 ## Risks / Trade-offs
 
-- [Removing install method] → Users who relied on `plugin-kit` CLI lose that path. Mitigated by `--plugin-dir` and marketplace being strictly better alternatives.
-- [CI breakage during transition] → If CI runs between deleting `cli/` and updating the workflow path. Mitigated by making all changes in a single commit.
+- [No pre-commit hooks] → Losing lint/format checks on commit. Acceptable because no JS/TS plugin code exists to lint.
+- [jq dependency in CI] → `jq` is pre-installed on GitHub Actions ubuntu runners, so no additional setup needed.

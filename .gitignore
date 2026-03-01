@@ -12,12 +12,6 @@ Thumbs.db
 .mcp.json
 .worktreeinclude.yaml
 
-# Node modules (if plugins use npm)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
 # Environment files
 .env
 .env.local
@@ -33,7 +27,5 @@ yarn-error.log*
 # Build outputs
 build/
 *.log
-*.bun-build
-*/dist/
 .spectra/
 openspec/.vector-search.db

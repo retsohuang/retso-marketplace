@@ -20,4 +20,33 @@
 
 - [x] 4.1 Run `bun run typecheck` — should pass
 - [x] 4.2 Run `bun test` — should pass
-- [x] 4.3 Commit all changes: `refactor: remove CLI installer in favor of native plugin-dir support`
+- [x] 4.3 Commit all changes: `refactor: remove CLI plugin installer in favor of native plugin-dir support`
+
+## 5. Replace validate-plugin.ts with shell script
+
+- [x] 5.1 Delete `scripts/validate-plugin.ts`
+- [x] 5.2 Create `scripts/validate-plugin.sh` using jq to validate `.claude-plugin/plugin.json` (check required fields: name matches directory, description, version semver, referenced commands/agents files exist)
+- [x] 5.3 Verify `bash scripts/validate-plugin.sh plugins/github-tools` runs successfully
+
+## 6. Remove Node.js toolchain
+
+- [x] 6.1 Delete `package.json`
+- [x] 6.2 Delete `bun.lock`
+- [x] 6.3 Remove lefthook pre-commit hooks — delete `lefthook.yml`
+- [x] 6.4 Delete `node_modules/` directory
+- [x] 6.5 Clean up `.gitignore` — remove `node_modules/` and npm/yarn log entries
+
+## 7. Rewrite CI workflow
+
+- [x] 7.1 Remove the check CI job entirely from `.github/workflows/ci.yml`
+- [x] 7.2 Update `validate-plugins` job: remove bun setup and `bun install`, use `bash scripts/validate-plugin.sh` instead
+
+## 8. Update documentation
+
+- [x] 8.1 Update Plugin Structure section in `README.md` — change `plugin.json` at root to `.claude-plugin/plugin.json`
+- [x] 8.2 Update `CLAUDE.md` — remove any remaining bun/node references
+
+## 9. Verification
+
+- [ ] 9.1 Push and confirm CI passes on PR #17
+- [x] 9.2 Commit all changes

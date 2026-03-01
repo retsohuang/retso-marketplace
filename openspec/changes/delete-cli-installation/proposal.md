@@ -4,11 +4,11 @@ The CLI installer (`plugin-kit` / `pk`) was built before Claude Code supported `
 
 ## What Changes
 
-- **Remove** the entire `cli/` directory (React + Ink terminal UI, build scripts, install script)
-- **Relocate** `cli/scripts/validate-plugin.ts` to a top-level `scripts/` directory (still used by CI)
-- **Inline** the `PluginManifestSchema` into the relocated validate script (eliminating the dependency on `cli/src/types/plugin.ts`)
-- **Update** project configuration: `package.json` workspaces, `.gitignore`, CI workflow path, README, CLAUDE.md
-- **Regenerate** `bun.lock` without CLI dependencies
+- **Remove** the entire `cli/` directory (React + Ink terminal UI, build scripts, install script) *(done)*
+- **Remove** the entire Node.js/Bun toolchain: `package.json`, `bun.lock`, `node_modules/`, `lefthook.yml`
+- **Replace** `scripts/validate-plugin.ts` (Bun + Zod) with `scripts/validate-plugin.sh` (shell + jq), validating `.claude-plugin/plugin.json` instead of root `plugin.json`
+- **Rewrite** CI workflow: remove `check` job, simplify `validate-plugins` to use shell script without bun
+- **Update** documentation: README Plugin Structure section, CLAUDE.md, `.gitignore`
 
 ## Capabilities
 
@@ -22,6 +22,6 @@ The CLI installer (`plugin-kit` / `pk`) was built before Claude Code supported `
 
 ## Impact
 
-- Affected code: `cli/` (deleted), `scripts/validate-plugin.ts` (new location), `.github/workflows/ci.yml`, `package.json`, `README.md`, `CLAUDE.md`, `.gitignore`, `bun.lock`
-- Dependencies removed: `ink`, `react`, `ink-text-input`, `yaml` (CLI-only dependencies)
+- Affected code: `cli/` (deleted), `scripts/validate-plugin.ts` → `scripts/validate-plugin.sh`, `.github/workflows/ci.yml`, `package.json` (deleted), `bun.lock` (deleted), `lefthook.yml` (deleted), `README.md`, `CLAUDE.md`, `.gitignore`
+- All npm dependencies removed — project no longer uses Node.js/Bun runtime
 - No plugin functionality affected — marketplace and `--plugin-dir` workflows remain unchanged

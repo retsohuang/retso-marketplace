@@ -5,28 +5,6 @@ on:
     branches: [main]
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Build
-        run: bun run build
-
-      - name: Type check
-        run: bun run typecheck
-
-      - name: Test
-        run: bun test
-
   validate-plugins:
     runs-on: ubuntu-latest
 
@@ -34,13 +12,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
 
       - name: Get modified plugins
         id: changed-plugins
@@ -57,9 +28,9 @@ jobs:
           failed=0
           while IFS= read -r plugin_dir; do
             [ -z "$plugin_dir" ] && continue
-            if [ -f "${plugin_dir}/plugin.json" ]; then
+            if [ -f "${plugin_dir}/.claude-plugin/plugin.json" ]; then
               echo "Validating: $plugin_dir"
-              if ! bun scripts/validate-plugin.ts "$plugin_dir"; then
+              if ! bash scripts/validate-plugin.sh "$plugin_dir"; then
                 failed=1
               fi
             fi
