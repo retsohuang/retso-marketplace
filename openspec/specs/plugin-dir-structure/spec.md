@@ -2,7 +2,7 @@
 
 ## Purpose
 
-TBD - created by archiving change 'fix-hooks-registration'. Update Purpose after archive.
+Standard directory structure for Claude Code plugins in the marketplace, ensuring manifests and hooks are discoverable by Claude Code's plugin loader.
 
 ## Requirements
 
