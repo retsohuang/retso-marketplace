@@ -17,7 +17,7 @@ def parse_worktreeinclude(config_path):
     with open(config_path, "r") as f:
         for line in f:
             stripped = line.strip()
-            if stripped == "files:" or stripped.startswith("files:"):
+            if stripped.startswith("files:"):
                 # Check for inline list: files: [".env", ".env.local"]
                 after = stripped[len("files:"):].strip()
                 if after.startswith("["):
@@ -37,6 +37,9 @@ def parse_worktreeinclude(config_path):
                 match = re.match(r"^\s+-\s+(.+)$", line)
                 if match:
                     value = match.group(1).strip().strip("'\"")
+                    # Strip inline YAML comments (e.g., ".env  # comment")
+                    if " #" in value:
+                        value = value[:value.index(" #")].rstrip()
                     if value:
                         files.append(value)
     return files
