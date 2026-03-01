@@ -28,41 +28,6 @@ Users can add this marketplace to their Claude Code installation using one of th
 /plugin marketplace add https://github.com/retsohuang/retso-marketplace.git
 ```
 
-## CLI Tool (Manual Installation)
-
-For manual plugin installation without the marketplace system, use **plugin-kit** - an interactive terminal UI.
-
-### Installing the CLI
-
-```bash
-./cli/install.sh
-```
-
-This installs the `plugin-kit` binary to `~/.local/bin/` with a `pk` shorthand alias.
-
-### Using the CLI
-
-```bash
-plugin-kit   # or just: pk
-```
-
-The interactive wizard guides you through:
-
-1. **Plugin Selection** - Search and select plugins using arrow keys and spacebar
-2. **Installation Location** - Choose `./.claude` (project-local) or a custom path
-3. **Conflict Resolution** - Handle existing plugins (override or skip)
-4. **Installation** - Plugins are extracted with their commands, agents, and skills
-
-### Keyboard Controls
-
-| Key | Action |
-|-----|--------|
-| `↑↓` | Navigate |
-| `Space` | Toggle selection |
-| `Enter` | Confirm |
-| `Esc` | Exit/Back |
-| Type | Search plugins |
-
 ## Using Plugins
 
 Once the marketplace is added, install plugins with:
@@ -161,7 +126,8 @@ A typical plugin in this marketplace should follow this structure:
 
 ```
 plugins/my-plugin/
-├── plugin.json          # Plugin metadata (optional if strict: false)
+├── .claude-plugin/
+│   └── plugin.json      # Plugin metadata
 ├── commands/            # Slash commands
 │   └── my-command.md
 ├── agents/              # AI agents
