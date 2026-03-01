@@ -189,6 +189,7 @@ The marketplace is configured in `.claude-plugin/marketplace.json`. Key fields:
 | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ---------- |
 | [code-review-tools](./plugins/code-review-tools/README.md) | Review code changes commit-by-commit with custom rules support. Includes interactive setup and rule creation.                                                 | 2.1.1   | Manual ¹   |
 | [github-tools](./plugins/github-tools/README.md)           | GitHub workflow tools for daily development. Analyze PR review comments and categorize what needs fixing.                                                     | 0.1.1   | Either     |
+| [worktree-bootstrap](./plugins/worktree-bootstrap/README.md) | Automatically copy gitignored files to new worktrees using .worktreeinclude.yaml                                                                             | 0.1.0   | Either     |
 
 ¹ **Manual installation recommended** - Supports custom review rules in the `references/` directory, which requires local file access not available via marketplace installation.
 

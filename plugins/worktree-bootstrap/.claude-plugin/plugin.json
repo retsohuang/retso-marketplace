@@ -1,0 +1,12 @@
+{
+  "name": "worktree-bootstrap",
+  "version": "0.1.0",
+  "description": "Automatically copy gitignored files to new worktrees using .worktreeinclude.yaml",
+  "author": {
+    "name": "Retso Huang",
+    "email": "retsohuang@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["worktree", "env", "bootstrap", "hooks"],
+  "skills": ["./skills/configure"]
+}

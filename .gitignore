@@ -10,6 +10,7 @@ Thumbs.db
 # Claude Code settings
 .claude/
 .mcp.json
+.worktreeinclude.yaml
 
 # Node modules (if plugins use npm)
 node_modules/
@@ -35,3 +36,5 @@ build/
 *.bun-build
 */dist/
 cli/src/generated/
+.spectra/
+openspec/.vector-search.db
