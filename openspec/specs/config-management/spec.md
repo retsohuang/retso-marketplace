@@ -6,7 +6,7 @@ Configuration management for the worktree-bootstrap plugin, covering initializat
 
 ### Requirement: Initialize worktreeinclude configuration
 
-The `config` skill SHALL create a `.worktreeinclude.yaml` file in the project root when one does not already exist. The skill SHALL scan the project for ignored files using `git ls-files --others --ignored --exclude-standard`, which covers all ignore sources (`.gitignore`, `.git/info/exclude`, and global gitignore). The skill SHALL present discovered files to the user as candidates. The generated file SHALL use the `files:` key with a YAML list of selected file paths.
+The `configure` skill SHALL create a `.worktreeinclude.yaml` file in the project root when one does not already exist. The skill SHALL scan the project for ignored files using `git ls-files --others --ignored --exclude-standard`, which covers all ignore sources (`.gitignore`, `.git/info/exclude`, and global gitignore). The skill SHALL present discovered files to the user as candidates. The generated file SHALL use the `files:` key with a YAML list of selected file paths.
 
 #### Scenario: No existing configuration file and no specific files mentioned
 
@@ -37,11 +37,11 @@ code:
 ---
 ### Requirement: Add entries to existing configuration
 
-The `config` skill SHALL accept file or directory paths via arguments (e.g., `/worktree-bootstrap:config .env .env.local`) or from the user's natural language input. When specific files are provided, the skill SHALL verify each path is ignored (via `.gitignore`, `.git/info/exclude`, or global gitignore) using `git check-ignore`, then add the valid entries to the existing `.worktreeinclude.yaml`. If the config file does not exist, it SHALL be created with the provided entries.
+The `configure` skill SHALL accept file or directory paths via arguments (e.g., `/worktree-bootstrap:configure .env .env.local`) or from the user's natural language input. When specific files are provided, the skill SHALL verify each path is ignored (via `.gitignore`, `.git/info/exclude`, or global gitignore) using `git check-ignore`, then add the valid entries to the existing `.worktreeinclude.yaml`. If the config file does not exist, it SHALL be created with the provided entries.
 
 #### Scenario: Add specific files via arguments
 
-- **WHEN** user runs `/worktree-bootstrap:config .env.production` and the path is ignored
+- **WHEN** user runs `/worktree-bootstrap:configure .env.production` and the path is ignored
 - **THEN** the skill adds `.env.production` to the `files:` list in `.worktreeinclude.yaml`
 
 #### Scenario: Add specific files via natural language
@@ -73,7 +73,7 @@ code:
 ---
 ### Requirement: Show existing configuration
 
-The `config` skill SHALL display the current contents of `.worktreeinclude.yaml` when the file already exists and no specific files are mentioned.
+The `configure` skill SHALL display the current contents of `.worktreeinclude.yaml` when the file already exists and no specific files are mentioned.
 
 #### Scenario: Configuration file already exists without specific files
 
