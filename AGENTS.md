@@ -2,7 +2,7 @@
 
 # Spectra Instructions
 
-This project uses Spectra for Spec-Driven Development(SDD). Specs live in `openspec/specs/`, change proposals in `openspec/changes/`.
+This project uses Spectra for Spec-Driven Development (SDD). Specs live in `openspec/specs/`, change proposals in `openspec/changes/`.
 
 ## Use `/spectra:*` skills when:
 
@@ -15,7 +15,7 @@ This project uses Spectra for Spec-Driven Development(SDD). Specs live in `opens
 
 ## Workflow
 
-discuss? → propose → apply ⇄ ingest → archive
+discuss? → propose → apply ⇄ ingest → verify → archive
 
 - `discuss` is optional — skip if requirements are clear
 - Requirements change mid-work? Plan mode → `ingest` → resume `apply`
