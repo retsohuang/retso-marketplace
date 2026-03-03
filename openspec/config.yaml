@@ -1,4 +1,6 @@
 schema: spec-driven
+claude_slash_commands: false
+parallel_tasks: true
 
 # Project context (optional)
 # This is shown to AI when creating artifacts.

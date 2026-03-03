@@ -20,12 +20,12 @@ This plugin provides AI-powered code review capabilities that analyze git commit
 Review all commits from a specific commit hash to HEAD:
 
 ```bash
-/code-review-tools:review <commit-hash>
+/code-review <commit-hash>
 ```
 
 **Example:**
 ```bash
-/code-review-tools:review abc123
+/code-review abc123
 ```
 
 ### 2. Setup Custom Configuration
@@ -64,9 +64,10 @@ This plugin uses a **TypeScript CLI** for robust code processing, compiled to Ja
 ```
 code-review-tools/
 ├── commands/         # Slash commands (orchestration)
-│   ├── review.md     # Main review command
-│   ├── init.md       # Configuration setup
-│   └── create-rule.md # Custom rule generator
+│   ├── init.md             # Configuration setup
+│   └── create-rule.md      # Custom rule generator
+├── skills/           # Auto-invoked skills
+│   └── code-review/SKILL.md # Main review skill
 ├── agents/           # Sub-agents for parallel processing
 │   ├── commit-reviewer.md  # Reviews individual commits
 │   └── report-writer.md    # Aggregates and writes reports
@@ -403,9 +404,9 @@ Common custom rule categories:
 
 ## Commands
 
-| Command                                   | Description                         |
+| Command / Skill                           | Description                         |
 | ----------------------------------------- | ----------------------------------- |
-| `/code-review-tools:review <commit-hash>` | Run code review from commit to HEAD |
+| `/code-review <commit-hash>`              | Run code review from commit to HEAD |
 | `/code-review-tools:init`                 | Interactive setup for configuration |
 | `/code-review-tools:create-rule`          | Create custom rules interactively   |
 
@@ -413,7 +414,7 @@ Common custom rule categories:
 
 ### Terminal Output
 
-When you run `/code-review-tools:review`, you'll see a concise summary in the terminal:
+When you run `/code-review`, you'll see a concise summary in the terminal:
 - Quick statistics: commits reviewed, files changed, issues found
 - Review process information (agents used, batching)
 - Top issue categories with counts
@@ -509,7 +510,7 @@ Full detailed reports are automatically saved to markdown files with:
 ## Files and Directories
 
 ```
-plugins/code-review/
+plugins/code-review-tools/
 ├── plugin.json              # Plugin metadata
 ├── README.md                # This file
 ├── config-schema.json       # Configuration schema
@@ -517,9 +518,10 @@ plugins/code-review/
 │   ├── commit-reviewer.md  # Sub-agent: reviews one commit with all rules
 │   └── report-writer.md    # Sub-agent: orchestrates review, writes report (Sonnet)
 ├── commands/
-│   ├── review.md           # Main review command
 │   ├── init.md             # Setup command
 │   └── create-rule.md      # Rule creation command
+├── skills/
+│   └── code-review/SKILL.md # Main review skill
 ├── rules/
 │   ├── component-extraction-rules.md
 │   ├── component-reuse-rules.md
@@ -550,8 +552,9 @@ plugins/code-review/
 
 To improve this plugin:
 1. Built-in rules are in `plugins/code-review-tools/rules/`
-2. Commands are in `plugins/code-review-tools/commands/`
-3. Follow existing patterns for consistency
+2. Skills are in `plugins/code-review-tools/skills/`
+3. Commands are in `plugins/code-review-tools/commands/`
+4. Follow existing patterns for consistency
 4. Test with various commit scenarios
 
 ### For Developers

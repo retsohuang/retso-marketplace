@@ -8,6 +8,5 @@
   },
   "license": "MIT",
   "keywords": ["code-review", "git", "quality", "components", "custom-rules"],
-  "commands": ["./commands/review.md"],
   "skills": ["./skills/code-review"]
 }
